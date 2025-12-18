@@ -1,5 +1,10 @@
 # todo-apps
 
+## Development Setup
+
+### Conventional Commits
+
+This project enforces [Conventional Commits](https://www.conventionalcommits.org/) format for commit messages.
 
 #### Setup pre-commit hooks
 
@@ -14,5 +19,3 @@
    ```bash
    pre-commit install --hook-type commit-msg
    ```
-
-
