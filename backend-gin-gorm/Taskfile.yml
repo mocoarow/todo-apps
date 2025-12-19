@@ -1,0 +1,17 @@
+---
+version: "3"
+
+dotenv: ['.env']
+
+tasks:
+  check:
+    cmds:
+      - golangci-lint run --config ../.golangci.yml --timeout=5m
+
+  air:
+    cmds:
+      - docker compose -f compose.local.air.yml up
+
+  run:
+    cmds:
+      - go run .

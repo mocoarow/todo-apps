@@ -1,0 +1,19 @@
+---
+services:
+  local-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    ports:
+      - 127.0.0.1:8080:8080
+      - 127.0.0.1:8081:8081
+    volumes:
+      - ./:/app
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - AUDIT_WRITE
+      - MKNOD
+      - NET_RAW
+      - SETFCAP
+      - SYS_CHROOT
