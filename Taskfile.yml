@@ -1,0 +1,14 @@
+---
+version: "3"
+
+tasks:
+  kicks:
+    cmds:
+      - docker run -t -v ./:/path checkmarx/kics scan -p /path
+
+  download-openapi-yaml:
+    desc: "Download openapi.yaml from Apidog"
+    cmds:
+      - scripts/download-openapi-yaml.sh
+      - mv openapi.yaml openapi/openapi.yaml
+      - echo "✅ openapi.yaml downloaded to openapi/openapi.yaml"

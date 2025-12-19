@@ -1,0 +1,458 @@
+---
+openapi: 3.0.1
+info:
+  title: Todo App API
+  description: A Todo application API with authentication
+  version: '1.0'
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: API Support
+    url: http://www.swagger.io/support
+    email: support@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+  - name: auth
+  - name: todo
+paths:
+  /api/v1/auth/authenticate:
+    post:
+      summary: User authentication
+      deprecated: false
+      description: Authenticate user with login ID and password
+      operationId: authenticate
+      tags:
+        - auth
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticateRequest'
+            examples: {}
+        required: true
+      responses:
+        '200':
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticateResponse'
+          headers: {}
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+      # kics-scan ignore-line
+      security: []
+  /api/v1/todo:
+    get:
+      summary: Get all todos
+      deprecated: false
+      description: Get all todos for the authenticated user
+      operationId: getTodos
+      tags:
+        - todo
+      parameters: []
+      responses:
+        '200':
+          description: Successfully retrieved todos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindTodoResponse'
+          headers: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+      security:
+        - BearerAuth: []
+    post:
+      summary: Create a new todo
+      deprecated: false
+      description: Create a new todo for the authenticated user
+      operationId: createTodo
+      tags:
+        - todo
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTodoRequest'
+            examples: {}
+        required: true
+      responses:
+        '201':
+          description: Successfully created todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTodoResponse'
+          headers: {}
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+      security:
+        - BearerAuth: []
+  /api/v1/todo/bulk:
+    post:
+      summary: Create multiple todos
+      deprecated: false
+      description: Create multiple todos for the authenticated user in a single request
+      operationId: createBulkTodos
+      tags:
+        - todo
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBulkTodosRequest'
+            examples: {}
+        required: true
+      responses:
+        '201':
+          description: Successfully created todos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBulkTodosResponse'
+          headers: {}
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+      security:
+        - BearerAuth: []
+  /api/v1/todo/{id}:
+    put:
+      operationId: updateTodo
+      summary: Update a todo
+      deprecated: false
+      description: Update an existing todo for the authenticated user
+      tags:
+        - todo
+      parameters:
+        - name: id
+          in: path
+          description: Todo ID
+          required: true
+          example: 0
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTodoRequest'
+            examples: {}
+        required: true
+      responses:
+        '200':
+          description: Successfully updated todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateTodoResponse'
+          headers: {}
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+      security:
+        - BearerAuth: []
+    delete:
+      summary: Delete a todo
+      deprecated: false
+      description: Delete an existing todo for the authenticated user
+      operationId: deleteTodo
+      tags:
+        - todo
+      parameters:
+        - name: id
+          in: path
+          description: Todo ID
+          required: true
+          example: 0
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Successfully deleted todo
+          headers: {}
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+      security:
+        - BearerAuth: []
+components:
+  schemas:
+    AuthenticateRequest:
+      type: object
+      properties:
+        loginId:
+          type: string
+          x-go-name: LoginID
+          x-go-custom-tag: binding:"required,max=100"
+          pattern: ^.*$
+          maxLength: 100
+        password:
+          type: string
+          x-go-custom-tag: binding:"required"
+          minLength: 8
+          maxLength: 20
+          pattern: ^.*$
+      required:
+        - loginId
+        - password
+    CreateBulkTodosRequest:
+      type: object
+      required:
+        - todos
+      properties:
+        todos:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/CreateTodoRequest'
+          x-go-custom-tag: binding:"required,min=1,max=100,dive"
+    FindTodoResponse:
+      type: object
+      properties:
+        todos:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindTodoResponseTodo'
+          maxItems: 100
+      required:
+        - todos
+    UpdateTodoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          x-go-name: ID
+        text:
+          type: string
+          pattern: ^.*$
+          maxLength: 250
+        isComplete:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateTodoRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          maxLength: 250
+          x-go-custom-tag: binding:"required,max=250"
+          pattern: ^.*$
+    CreateTodoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          x-go-name: ID
+        text:
+          type: string
+          pattern: ^.*$
+          maxLength: 250
+        isComplete:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateTodoRequest:
+      type: object
+      required:
+        - text
+      properties:
+        id:
+          type: integer
+          x-go-name: ID
+          x-go-omitempty: true
+        text:
+          type: string
+          maxLength: 250
+          x-go-custom-tag: binding:"required,max=250"
+          pattern: ^.*$
+        isComplete:
+          type: boolean
+          x-go-omitempty: true
+    FindTodoResponseTodo:
+      type: object
+      required:
+        - id
+        - text
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          x-go-name: ID
+        text:
+          type: string
+          maxLength: 250
+          pattern: ^.*$
+        isComplete:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              pattern: ^.*$
+            message:
+              type: string
+              pattern: ^.*$
+    AuthenticateResponse:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+          pattern: ^.*$
+    CreateBulkTodosResponse:
+      type: object
+      properties:
+        todos:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateTodoResponse'
+          maxItems: 100
+  responses: {}
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+servers: []
+security: []
