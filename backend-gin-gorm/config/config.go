@@ -8,13 +8,17 @@ import (
 
 	"go.yaml.in/yaml/v4"
 
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/gin"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
 type ServerConfig struct {
-	HTTPPort             int `yaml:"httpPort" validate:"required"`
-	MetricsPort          int `yaml:"metricsPort" validate:"required"`
-	ReadHeaderTimeoutSec int `yaml:"readHeaderTimeoutSec" validate:"gte=1"`
+	HTTPPort             int                        `yaml:"httpPort" validate:"required"`
+	MetricsPort          int                        `yaml:"metricsPort" validate:"required"`
+	ReadHeaderTimeoutSec int                        `yaml:"readHeaderTimeoutSec" validate:"gte=1"`
+	Gin                  *gin.GinConfig             `yaml:"gin" validate:"required"`
+	Shutdown             *controller.ShutdownConfig `yaml:"shutdown" validate:"required"`
 }
 
 type Config struct {
