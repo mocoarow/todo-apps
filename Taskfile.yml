@@ -2,9 +2,18 @@
 version: "3"
 
 tasks:
-  kicks:
+  check:
     cmds:
-      - docker run -t -v ./:/path checkmarx/kics scan -p /path
+      - task: check:backend-gin-gorm
+
+  check:backend-gin-gorm:
+    dir: backend-gin-gorm
+    cmds:
+      - task check
+
+  kics:
+    cmds:
+      - docker run -t -v ./:/path checkmarx/kics scan -p /path --config /path/.github/kics.yml
 
   download-openapi-yaml:
     desc: "Download openapi.yaml from Apidog"

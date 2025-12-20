@@ -1,0 +1,5 @@
+---
+server:
+  httpPort: ${HTTP_PORT:-8080}
+  metricsPort: ${METRICS_PORT:-8081}
+  readHeaderTimeoutSec: ${READ_HEADER_TIMEOUT_SEC:-30}
