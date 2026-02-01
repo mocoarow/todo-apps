@@ -1,1 +1,4 @@
 tmp/**
+coverage.out
+coverage.lcov
+.mise.toml

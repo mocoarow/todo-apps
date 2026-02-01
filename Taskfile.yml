@@ -7,13 +7,20 @@ tasks:
       - task: check:backend-gin-gorm
 
   check:backend-gin-gorm:
-    dir: backend-gin-gorm
     cmds:
-      - task check
+      - task -d backend-gin-gorm check
 
   kics:
     cmds:
       - docker run -t -v ./:/path checkmarx/kics scan -p /path --config /path/.github/kics.yml
+
+  test:
+    cmds:
+      - task: test:backend-gin-gorm
+
+  test:backend-gin-gorm:
+    cmds:
+      - task -d backend-gin-gorm test
 
   download-openapi-yaml:
     desc: "Download openapi.yaml from Apidog"
