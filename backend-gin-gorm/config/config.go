@@ -17,7 +17,7 @@ type ServerConfig struct {
 	HTTPPort             int                        `yaml:"httpPort" validate:"required"`
 	MetricsPort          int                        `yaml:"metricsPort" validate:"required"`
 	ReadHeaderTimeoutSec int                        `yaml:"readHeaderTimeoutSec" validate:"gte=1"`
-	Gin                  *gin.GinConfig             `yaml:"gin" validate:"required"`
+	Gin                  *gin.Config                `yaml:"gin" validate:"required"`
 	Shutdown             *controller.ShutdownConfig `yaml:"shutdown" validate:"required"`
 }
 
@@ -60,8 +60,8 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("yaml.Unmarshal. filename: %s, err: %w", filename, err)
 	}
 
-	if err := domain.Validator.Struct(&conf); err != nil {
-		return nil, fmt.Errorf("Validator.Struct. filename: %s, err: %w", filename, err)
+	if err := domain.ValidateStruct(&conf); err != nil {
+		return nil, fmt.Errorf("validate struct. filename: %s, err: %w", filename, err)
 	}
 
 	return &conf, nil

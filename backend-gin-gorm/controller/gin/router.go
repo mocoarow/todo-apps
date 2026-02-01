@@ -23,18 +23,18 @@ type DebugConfig struct {
 	Gin  bool `yaml:"gin"`
 	Wait bool `yaml:"wait"`
 }
-type GinConfig struct {
+type Config struct {
 	CORS  *CORSConfig  `yaml:"cors" validate:"required"`
 	Log   *LogConfig   `yaml:"log" validate:"required"`
 	Debug *DebugConfig `yaml:"debug" validate:"required"`
 }
 
-func InitRootRouterGroup(_ context.Context, ginConfig *GinConfig, appName string) *gin.Engine {
-	if !ginConfig.Debug.Gin {
+func InitRootRouterGroup(_ context.Context, config *Config, appName string) *gin.Engine {
+	if !config.Debug.Gin {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	corsConfig := InitCORS(ginConfig.CORS)
+	corsConfig := InitCORS(config.CORS)
 
 	router := gin.New()
 	router.Use(gin.Recovery())
@@ -44,13 +44,13 @@ func InitRootRouterGroup(_ context.Context, ginConfig *GinConfig, appName string
 		return req.URL.Path != "/"
 	})))
 
-	if ginConfig.Log.AccessLog {
+	if config.Log.AccessLog {
 		withRequestBody := false
-		if ginConfig.Log.AccessLogRequestBody {
+		if config.Log.AccessLogRequestBody {
 			withRequestBody = true
 		}
 		withResponseBody := false
-		if ginConfig.Log.AccessLogResponseBody {
+		if config.Log.AccessLogResponseBody {
 			withResponseBody = true
 		}
 		router.Use(sloggin.NewWithConfig(slog.Default(), sloggin.Config{ //nolint:exhaustruct
@@ -68,7 +68,7 @@ func InitRootRouterGroup(_ context.Context, ginConfig *GinConfig, appName string
 		}))
 	}
 
-	if ginConfig.Debug.Wait {
+	if config.Debug.Wait {
 		router.Use(middleware.NewWaitMiddleware(time.Second))
 	}
 
