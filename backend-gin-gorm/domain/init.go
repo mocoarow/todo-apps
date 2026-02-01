@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"github.com/go-playground/validator/v10"
-)
+import "github.com/go-playground/validator/v10"
 
 const (
 	LoggerNameKey = "logger_name"
@@ -10,5 +8,9 @@ const (
 )
 
 var (
-	Validator = validator.New()
+	v = validator.New()
 )
+
+func ValidateStruct(s interface{}) error {
+	return v.Struct(s) //nolint:wrapcheck
+}
