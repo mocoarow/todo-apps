@@ -14,7 +14,18 @@ tasks:
 
   run:
     cmds:
+      - docker compose -f compose.local.collector-tui.yml up -d --wait
       - go run .
+    env:
+      APP_ENV: local
+      MYSQL_HOST: localhost
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: local
+      TRACE_EXPORTER: otlphttp
+      LOG_EXPORTER: none
+  clear-local:
+    cmds:
+      - docker compose -f compose.local.collector-tui.yml down
 
   test:
     cmds:

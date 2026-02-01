@@ -1,0 +1,33 @@
+---
+services:
+  local-todo-mysql:
+    extends:
+      service: local-todo-mysql-base
+      file: ../compose.common-mysql.yml
+    networks:
+      - backend-gin-gorm
+
+  local-todo-otel-collector:
+    extends:
+      service: local-todo-otel-collector-base
+      file: ../compose.common-otel-collector.yml
+    volumes:
+      - ./otel-collector-config.tui.yaml:/etc/otel-collector-config.yaml:ro
+    networks:
+      - backend-gin-gorm
+    depends_on:
+      - local-todo-otel-tui
+
+  local-todo-otel-tui:
+    image: ymtdzzz/otel-tui:latest
+    container_name: local-todo-otel-tui
+    stdin_open: true
+    tty: true
+    # Override entrypoint if you want use options
+    entrypoint: ["/otel-tui", "--enable-zipkin"]
+    networks:
+      - backend-gin-gorm
+
+networks:
+  backend-gin-gorm:
+    driver: bridge

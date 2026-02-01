@@ -18,3 +18,12 @@ server:
   shutdown:
     timeSec1: ${SHUTDOWN_TIME_SEC1:-1}
     timeSec2: ${SHUTDOWN_TIME_SEC2:-1}
+
+db:
+  driverName: ${APP_DB_DRIVER_NAME:-mysql}
+  mysql:
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    host: ${MYSQL_HOST:-127.0.0.1}
+    port: ${MYSQL_PORT:-3306}
+    database: ${MYSQL_DATABASE:-local}

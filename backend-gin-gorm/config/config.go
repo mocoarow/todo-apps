@@ -11,6 +11,7 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/gin"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/gateway"
 )
 
 type ServerConfig struct {
@@ -22,7 +23,8 @@ type ServerConfig struct {
 }
 
 type Config struct {
-	Server *ServerConfig `yaml:"server" validate:"required"`
+	Server *ServerConfig     `yaml:"server" validate:"required"`
+	DB     *gateway.DBConfig `yaml:"db" validate:"required"`
 }
 
 //go:embed config.yml
