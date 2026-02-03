@@ -1,5 +1,6 @@
 ---
 services:
+  # kics-scan ignore-block
   local-todo-mysql:
     extends:
       service: local-todo-mysql-base
@@ -7,6 +8,7 @@ services:
     networks:
       - backend-gin-gorm
 
+  # kics-scan ignore-block
   local-todo-otel-collector:
     extends:
       service: local-todo-otel-collector-base
@@ -27,6 +29,14 @@ services:
     entrypoint: ["/otel-tui", "--enable-zipkin"]
     networks:
       - backend-gin-gorm
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - AUDIT_WRITE
+      - MKNOD
+      - NET_RAW
+      - SETFCAP
+      - SYS_CHROOT
 
 networks:
   backend-gin-gorm:

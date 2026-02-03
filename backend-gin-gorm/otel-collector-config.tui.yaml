@@ -1,3 +1,4 @@
+---
 receivers:
   otlp:
     protocols:
@@ -15,18 +16,18 @@ receivers:
 
 processors:
   batch:
- 
+
 exporters:
   otlp:
     endpoint: local-otel-tui:4317
     tls:
       insecure: true
- 
+
 extensions:
   health_check:
   pprof:
   zpages:
- 
+
 service:
   pipelines:
     traces:

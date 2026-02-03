@@ -42,3 +42,12 @@ tasks:
   clear-test:
     cmds:
       - docker compose -f compose.test.yml down
+
+  generate-openapi:
+    desc: "Generate OpenAPI models using oapi-codegen"
+    cmds:
+      - mkdir -p api
+      - rm -rf api/types.gen.go || true
+      - oapi-codegen -package=api -generate=models -o=api/types.gen.go ../openapi/openapi.yaml
+      - go fmt api/types.gen.go || true
+      - echo "Models generated"

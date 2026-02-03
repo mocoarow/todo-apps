@@ -1,4 +1,4 @@
-package gin
+package handler
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	sloggin "github.com/samber/slog-gin"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
-	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/gin/middleware"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/handler/middleware"
 )
 
 type LogConfig struct {
