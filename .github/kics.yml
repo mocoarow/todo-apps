@@ -4,6 +4,9 @@ no-progress: true
 no-color: true
 minimal-ui: true
 enable_comments: true
+exclude-paths:
+  - /path/openapi
+  - openapi
 exclude-severities:
   - low
   - info

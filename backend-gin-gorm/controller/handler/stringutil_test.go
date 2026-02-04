@@ -1,10 +1,10 @@
-package gin_test
+package handler_test
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/gin"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/handler"
 )
 
 func TestSplitCommaSeparated_shouldReturnExpectedSlice_whenInputVaries(t *testing.T) {
@@ -52,7 +52,7 @@ func TestSplitCommaSeparated_shouldReturnExpectedSlice_whenInputVaries(t *testin
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := gin.SplitCommaSeparated(tt.input)
+			got := handler.SplitCommaSeparated(tt.input)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Fatalf("SplitCommaSeparated(%q) = %#v, want %#v", tt.input, got, tt.want)
 			}

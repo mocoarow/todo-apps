@@ -5,8 +5,10 @@ import (
 	"time"
 )
 
+// ErrTodoNotFound is returned when a requested todo does not exist.
 var ErrTodoNotFound = fmt.Errorf("todo not found")
 
+// Todo represents a single todo item belonging to a user.
 type Todo struct {
 	ID         int    `validate:"required,gt=0"`
 	UserID     int    `validate:"required,gt=0"`
@@ -16,6 +18,7 @@ type Todo struct {
 	UpdatedAt  time.Time
 }
 
+// NewTodo creates a validated Todo. Returns an error if validation fails.
 func NewTodo(id int, userID int, text string, isComplete bool, createdAt, updatedAt time.Time) (*Todo, error) {
 	m := &Todo{
 		ID:         id,
@@ -33,11 +36,13 @@ func NewTodo(id int, userID int, text string, isComplete bool, createdAt, update
 	return m, nil
 }
 
+// CreateTodoInput holds the parameters required to create a single todo.
 type CreateTodoInput struct {
 	UserID int    `validate:"required,gt=0"`
 	Text   string `validate:"required,max=255"`
 }
 
+// NewCreateTodoInput creates a validated CreateTodoInput. Returns an error if validation fails.
 func NewCreateTodoInput(userID int, text string) (*CreateTodoInput, error) {
 	m := &CreateTodoInput{
 		UserID: userID,
@@ -50,10 +55,12 @@ func NewCreateTodoInput(userID int, text string) (*CreateTodoInput, error) {
 	return m, nil
 }
 
+// CreateTodoOutput holds the result of a single todo creation.
 type CreateTodoOutput struct {
 	Todo *Todo `validate:"required"`
 }
 
+// NewCreateTodoOutput creates a validated CreateTodoOutput. Returns an error if validation fails.
 func NewCreateTodoOutput(todo *Todo) (*CreateTodoOutput, error) {
 	m := &CreateTodoOutput{
 		Todo: todo,
@@ -64,11 +71,13 @@ func NewCreateTodoOutput(todo *Todo) (*CreateTodoOutput, error) {
 	return m, nil
 }
 
+// CreateBulkTodosInput holds the parameters required to create multiple todos at once (1-100 items).
 type CreateBulkTodosInput struct {
 	UserID int                `validate:"required,gt=0"`
 	Todos  []*CreateTodoInput `validate:"required,min=1,max=100,dive"`
 }
 
+// NewCreateBulkTodosInput creates a validated CreateBulkTodosInput. Returns an error if validation fails.
 func NewCreateBulkTodosInput(userID int, todos []*CreateTodoInput) (*CreateBulkTodosInput, error) {
 	m := &CreateBulkTodosInput{
 		UserID: userID,
@@ -80,10 +89,12 @@ func NewCreateBulkTodosInput(userID int, todos []*CreateTodoInput) (*CreateBulkT
 	return m, nil
 }
 
+// CreateBulkTodosOutput holds the result of a bulk todo creation.
 type CreateBulkTodosOutput struct {
 	Todos []*Todo `validate:"required,min=1,dive"`
 }
 
+// NewCreateBulkTodosOutput creates a validated CreateBulkTodosOutput. Returns an error if validation fails.
 func NewCreateBulkTodosOutput(todos []*Todo) (*CreateBulkTodosOutput, error) {
 	m := &CreateBulkTodosOutput{
 		Todos: todos,
@@ -94,6 +105,7 @@ func NewCreateBulkTodosOutput(todos []*Todo) (*CreateBulkTodosOutput, error) {
 	return m, nil
 }
 
+// UpdateTodoInput holds the parameters required to update an existing todo.
 type UpdateTodoInput struct {
 	ID         int    `validate:"required,gt=0"`
 	UserID     int    `validate:"required,gt=0"`
@@ -101,6 +113,7 @@ type UpdateTodoInput struct {
 	IsComplete bool
 }
 
+// NewUpdateTodoInput creates a validated UpdateTodoInput. Returns an error if validation fails.
 func NewUpdateTodoInput(id int, userID int, text string, isComplete bool) (*UpdateTodoInput, error) {
 	m := &UpdateTodoInput{
 		ID:         id,
@@ -114,10 +127,12 @@ func NewUpdateTodoInput(id int, userID int, text string, isComplete bool) (*Upda
 	return m, nil
 }
 
+// UpdateTodoOutput holds the result of a todo update.
 type UpdateTodoOutput struct {
 	Todo *Todo `validate:"required"`
 }
 
+// NewUpdateTodoOutput creates a validated UpdateTodoOutput. Returns an error if validation fails.
 func NewUpdateTodoOutput(todo *Todo) (*UpdateTodoOutput, error) {
 	m := &UpdateTodoOutput{
 		Todo: todo,
@@ -128,11 +143,13 @@ func NewUpdateTodoOutput(todo *Todo) (*UpdateTodoOutput, error) {
 	return m, nil
 }
 
+// DeleteTodoInput holds the parameters required to delete a todo.
 type DeleteTodoInput struct {
 	ID     int `validate:"required,gt=0"`
 	UserID int `validate:"required,gt=0"`
 }
 
+// NewDeleteTodoInput creates a validated DeleteTodoInput. Returns an error if validation fails.
 func NewDeleteTodoInput(id int, userID int) (*DeleteTodoInput, error) {
 	m := &DeleteTodoInput{
 		ID:     id,

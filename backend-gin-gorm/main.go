@@ -10,7 +10,7 @@ import (
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/config"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
-	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/gin"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/handler"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/gateway"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/process"
@@ -32,7 +32,7 @@ func run() (int, error) {
 	}
 	logger := slog.Default().With(slog.String(domain.LoggerNameKey, domain.AppName+"-main"))
 
-	router := gin.InitRootRouterGroup(ctx, cfg.Server.Gin, domain.AppName)
+	router := handler.InitRootRouterGroup(ctx, cfg.Server.Gin, domain.AppName)
 
 	// run
 	readHeaderTimeout := time.Duration(cfg.Server.ReadHeaderTimeoutSec) * time.Second

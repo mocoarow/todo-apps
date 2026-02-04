@@ -1,0 +1,43 @@
+---
+services:
+  # kics-scan ignore-block
+  local-todo-mysql:
+    extends:
+      service: local-todo-mysql-base
+      file: ../compose.common-mysql.yml
+    networks:
+      - backend-gin-gorm
+
+  # kics-scan ignore-block
+  local-todo-otel-collector:
+    extends:
+      service: local-todo-otel-collector-base
+      file: ../compose.common-otel-collector.yml
+    volumes:
+      - ./otel-collector-config.tui.yaml:/etc/otel-collector-config.yaml:ro
+    networks:
+      - backend-gin-gorm
+    depends_on:
+      - local-todo-otel-tui
+
+  local-todo-otel-tui:
+    image: ymtdzzz/otel-tui:latest
+    container_name: local-todo-otel-tui
+    stdin_open: true
+    tty: true
+    # Override entrypoint if you want use options
+    entrypoint: ["/otel-tui", "--enable-zipkin"]
+    networks:
+      - backend-gin-gorm
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - AUDIT_WRITE
+      - MKNOD
+      - NET_RAW
+      - SETFCAP
+      - SYS_CHROOT
+
+networks:
+  backend-gin-gorm:
+    driver: bridge
