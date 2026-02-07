@@ -11,15 +11,18 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// AuthUsecase defines the authentication use case required by the handler.
 type AuthUsecase interface {
 	Authenticate(input *domain.AuthenticateInput) (*domain.AuthenticateOutput, error)
 }
 
+// AuthHandler handles HTTP requests for user authentication.
 type AuthHandler struct {
 	usecase AuthUsecase
 	logger  *slog.Logger
 }
 
+// NewAuthHandler returns a new AuthHandler with the given use case.
 func NewAuthHandler(usecase AuthUsecase) *AuthHandler {
 	return &AuthHandler{
 		usecase: usecase,
@@ -27,6 +30,7 @@ func NewAuthHandler(usecase AuthUsecase) *AuthHandler {
 	}
 }
 
+// Authenticate handles POST /auth/authenticate and returns a JWT access token.
 func (h *AuthHandler) Authenticate(c *gin.Context) {
 	ctx := c.Request.Context()
 	var req api.AuthenticateRequest
@@ -61,6 +65,7 @@ func (h *AuthHandler) Authenticate(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// NewInitAuthRouterFunc returns an InitRouterGroupFunc that registers auth routes under an "auth" group.
 func NewInitAuthRouterFunc(authUsecase AuthUsecase) InitRouterGroupFunc {
 	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) {
 		auth := parentRouterGroup.Group("auth", middleware...)

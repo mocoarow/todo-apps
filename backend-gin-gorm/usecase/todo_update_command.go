@@ -7,16 +7,19 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// UpdateTodoCommand updates an existing todo item in the repository.
 type UpdateTodoCommand struct {
 	repo domain.TodoRepository
 }
 
+// NewUpdateTodoCommand returns a new UpdateTodoCommand.
 func NewUpdateTodoCommand(repo domain.TodoRepository) *UpdateTodoCommand {
 	return &UpdateTodoCommand{
 		repo: repo,
 	}
 }
 
+// Execute updates the todo and returns the updated result.
 func (u *UpdateTodoCommand) Execute(ctx context.Context, input *domain.UpdateTodoInput) (*domain.UpdateTodoOutput, error) {
 	todo, err := u.repo.UpdateTodo(ctx, input)
 	if err != nil {

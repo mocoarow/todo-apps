@@ -16,6 +16,7 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/process"
 )
 
+// WithMetricsServerProcess returns a RunProcessFunc that starts the metrics/healthcheck server.
 func WithMetricsServerProcess(port int, readHeaderTimeout, shutdownTime time.Duration) process.RunProcessFunc {
 	return func(ctx context.Context) process.RunProcess {
 		return func() error {
@@ -24,6 +25,7 @@ func WithMetricsServerProcess(port int, readHeaderTimeout, shutdownTime time.Dur
 	}
 }
 
+// MetricsServerProcess runs the metrics server exposing /healthcheck and /metrics endpoints.
 func MetricsServerProcess(ctx context.Context, port int, readHeaderTimeout, shutdownTime time.Duration) error {
 	logger := slog.Default().With(slog.String(domain.LoggerNameKey, "MetricsServer"))
 	router := gin.New()

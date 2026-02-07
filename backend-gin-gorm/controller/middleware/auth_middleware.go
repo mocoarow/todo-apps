@@ -13,10 +13,13 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// AuthUsecase defines the use case for extracting user info from a JWT token.
 type AuthUsecase interface {
 	GetUserInfo(input *domain.GetUserInfoInput) (*domain.GetUserInfoOutput, error)
 }
 
+// NewAuthMiddleware returns a Gin middleware that validates the Bearer token
+// from the Authorization header and sets the user ID in the Gin context.
 func NewAuthMiddleware(authUsecase AuthUsecase) gin.HandlerFunc {
 	logger := slog.Default().With(slog.String(domain.LoggerNameKey, domain.AppName+"-AuthMiddleware"))
 

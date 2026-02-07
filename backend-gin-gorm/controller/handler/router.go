@@ -1,3 +1,5 @@
+// Package handler provides Gin HTTP handlers for the REST API,
+// including request parsing, response mapping, routing, and CORS configuration.
 package handler
 
 import (
@@ -14,21 +16,25 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/middleware"
 )
 
+// LogConfig controls access log output settings.
 type LogConfig struct {
 	AccessLog             bool `yaml:"accessLog"`
 	AccessLogRequestBody  bool `yaml:"accessLogRequestBody"`
 	AccessLogResponseBody bool `yaml:"accessLogResponseBody"`
 }
+// DebugConfig controls debug-mode features (Gin debug mode, artificial wait).
 type DebugConfig struct {
 	Gin  bool `yaml:"gin"`
 	Wait bool `yaml:"wait"`
 }
+// Config holds handler-level configuration for CORS, logging, and debug settings.
 type Config struct {
 	CORS  *CORSConfig  `yaml:"cors" validate:"required"`
 	Log   *LogConfig   `yaml:"log" validate:"required"`
 	Debug *DebugConfig `yaml:"debug" validate:"required"`
 }
 
+// InitRootRouterGroup creates a Gin engine with recovery, CORS, metrics, tracing, and optional access logging.
 func InitRootRouterGroup(_ context.Context, config *Config, appName string) *gin.Engine {
 	if !config.Debug.Gin {
 		gin.SetMode(gin.ReleaseMode)

@@ -16,16 +16,19 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 )
 
+// OTLPLogConfig holds OTLP log exporter settings.
 type OTLPLogConfig struct {
 	Endpoint string `yaml:"endpoint" validate:"required"`
 	Insecure bool   `yaml:"insecure"`
 }
 
+// UptraceLogConfig holds Uptrace log exporter settings.
 type UptraceLogConfig struct {
 	Endpoint string `yaml:"endpoint" validate:"required"`
 	DSN      string `yaml:"dsn" validate:"required"`
 }
 
+// LogConfig holds logging configuration including level, platform, and exporter settings.
 type LogConfig struct {
 	Level    string            `yaml:"level"`
 	Platform string            `yaml:"platform"`
@@ -35,6 +38,8 @@ type LogConfig struct {
 	Uptrace  *UptraceLogConfig `yaml:"uptrace"`
 }
 
+// InitLog sets up the global slog logger. If the exporter is "none", it uses a local JSON handler;
+// otherwise it delegates to InitLogProvider for OTLP/Uptrace export.
 func InitLog(ctx context.Context, logConfig *LogConfig, appName string) (func(), error) {
 	if logConfig.Exporter == "none" {
 		defaultLogLevel := stringToLogLevel(logConfig.Level)
@@ -55,6 +60,7 @@ func InitLog(ctx context.Context, logConfig *LogConfig, appName string) (func(),
 
 const logShutdownTimeout = 5 * time.Second
 
+// InitLogExporterFunc is a function type that creates a log exporter from config.
 type InitLogExporterFunc func(ctx context.Context, logConfig *LogConfig) (sdklog.Exporter, error)
 
 func initLogExporter(ctx context.Context, logConfig *LogConfig) (sdklog.Exporter, error) {
@@ -71,6 +77,8 @@ func initLogExporter(ctx context.Context, logConfig *LogConfig) (sdklog.Exporter
 	return initLogExporter(ctx, logConfig)
 }
 
+// InitLogProvider creates an OpenTelemetry log provider with batch processing
+// and returns a shutdown function.
 func InitLogProvider(ctx context.Context, logConfig *LogConfig, appName string) (func(), error) {
 	exp, err := initLogExporter(ctx, logConfig)
 	if err != nil {

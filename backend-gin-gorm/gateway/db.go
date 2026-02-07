@@ -1,3 +1,5 @@
+// Package gateway provides infrastructure adapters for external systems
+// such as databases, JWT authentication, logging/telemetry, and OS signal handling.
 package gateway
 
 import (
@@ -9,19 +11,24 @@ import (
 	"gorm.io/gorm"
 )
 
+// DBConfig holds the database driver name and driver-specific configuration.
 type DBConfig struct {
 	DriverName string       `yaml:"driverName"`
 	MySQL      *MySQLConfig `yaml:"mysql"`
 }
 
+// DBConnection wraps an active GORM database connection along with its dialect.
 type DBConnection struct {
 	DriverName string
 	Dialect    DialectRDBMS
 	DB         *gorm.DB
 }
 
+// InitDBFunc is a function type that initializes a database connection for a specific driver.
 type InitDBFunc func(context.Context, *DBConfig, slog.Level, string) (DialectRDBMS, *gorm.DB, *sql.DB, error)
 
+// InitDB initializes a database connection based on the configured driver.
+// It returns the connection and a cleanup function to close the underlying sql.DB.
 func InitDB(ctx context.Context, dbConfig *DBConfig, logConfig *LogConfig, appName string) (*DBConnection, func(), error) {
 	initDBs := map[string]InitDBFunc{
 		"mysql": initDBMySQL,
@@ -54,6 +61,7 @@ func InitDB(ctx context.Context, dbConfig *DBConfig, logConfig *LogConfig, appNa
 	}, nil
 }
 
+// DialectRDBMS abstracts database dialect differences (e.g. default values).
 type DialectRDBMS interface {
 	Name() string
 	BoolDefaultValue() string

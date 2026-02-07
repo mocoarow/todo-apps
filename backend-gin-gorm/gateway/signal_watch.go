@@ -12,6 +12,7 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/process"
 )
 
+// WithSignalWatchProcess returns a RunProcessFunc that listens for OS shutdown signals.
 func WithSignalWatchProcess() process.RunProcessFunc {
 	return func(ctx context.Context) process.RunProcess {
 		return func() error {
@@ -20,6 +21,7 @@ func WithSignalWatchProcess() process.RunProcessFunc {
 	}
 }
 
+// SignalWatchProcess blocks until SIGINT/SIGTERM is received or the context is canceled.
 func SignalWatchProcess(ctx context.Context) error {
 	logger := slog.Default().With(slog.String(domain.LoggerNameKey, "SignalWatch"))
 	sigs := make(chan os.Signal, 1)

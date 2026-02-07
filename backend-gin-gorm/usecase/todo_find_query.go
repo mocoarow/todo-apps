@@ -7,16 +7,19 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// FindTodosQuery fetches todos for a specific user from the repository.
 type FindTodosQuery struct {
 	repo domain.TodoRepository
 }
 
+// NewFindTodosQuery returns a new FindTodosQuery.
 func NewFindTodosQuery(repo domain.TodoRepository) *FindTodosQuery {
 	return &FindTodosQuery{
 		repo: repo,
 	}
 }
 
+// Execute retrieves all todos for the given userID.
 func (q *FindTodosQuery) Execute(ctx context.Context, userID int) ([]domain.Todo, error) {
 	todos, err := q.repo.FindTodos(ctx, userID)
 	if err != nil {

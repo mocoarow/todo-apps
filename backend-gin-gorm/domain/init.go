@@ -1,3 +1,5 @@
+// Package domain defines core business entities, value objects, and repository interfaces.
+// All structs are validated on construction using go-playground/validator.
 package domain
 
 import "github.com/go-playground/validator/v10"
