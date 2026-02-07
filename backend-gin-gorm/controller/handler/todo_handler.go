@@ -11,7 +11,7 @@ import (
 
 // TodoUsecase defines the use case operations for managing todos.
 type TodoUsecase interface {
-	FindTodos(ctx context.Context, userID int) ([]*domain.Todo, error)
+	FindTodos(ctx context.Context, userID int) ([]domain.Todo, error)
 	CreateTodo(ctx context.Context, input *domain.CreateTodoInput) (*domain.CreateTodoOutput, error)
 	CreateBulkTodos(ctx context.Context, input *domain.CreateBulkTodosInput) (*domain.CreateBulkTodosOutput, error)
 	UpdateTodo(ctx context.Context, input *domain.UpdateTodoInput) (*domain.UpdateTodoOutput, error)

@@ -2,6 +2,36 @@ package domain
 
 import "fmt"
 
+type AuthenticateInput struct {
+	LoginID  string `validate:"required"`
+	Password string `validate:"required"`
+}
+
+func NewAuthenticateInput(loginID string, password string) (*AuthenticateInput, error) {
+	m := &AuthenticateInput{
+		LoginID:  loginID,
+		Password: password,
+	}
+	if err := ValidateStruct(m); err != nil {
+		return nil, fmt.Errorf("validate authenticate input: %w", err)
+	}
+	return m, nil
+}
+
+type AuthenticateOutput struct {
+	AccessToken string `validate:"required"`
+}
+
+func NewAuthenticateOutput(accessToken string) (*AuthenticateOutput, error) {
+	m := &AuthenticateOutput{
+		AccessToken: accessToken,
+	}
+	if err := ValidateStruct(m); err != nil {
+		return nil, fmt.Errorf("validate authenticate output: %w", err)
+	}
+	return m, nil
+}
+
 type UserInfo struct {
 	UserID  int    `validate:"required,gt=0"`
 	LoginID string `validate:"required"`

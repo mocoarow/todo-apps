@@ -32,7 +32,27 @@ func run() (int, error) {
 	}
 	logger := slog.Default().With(slog.String(domain.LoggerNameKey, domain.AppName+"-main"))
 
+	// dbc, shutdownDB, err := gateway.InitDB(ctx, cfg.DB, cfg.Log, domain.AppName)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer shutdownDB()
 	router := handler.InitRootRouterGroup(ctx, cfg.Server.Gin, domain.AppName)
+
+	// authUsecase := usecase.NewAuthUsecase()
+
+	// api
+	// api := router.Group("api")
+
+	// v1
+	// v1 := api.Group("v1")
+
+	// authMiddleware := middleware.NewAuthMiddleware(authUsecase)
+	// todoRepo := gateway.NewTodoRepository(dbc.DB)
+	// todoCreateBulkCommandTxManager := gateway.NewTodoCreateBulkCommandTxManager(dbc)
+	// todoUsecase := usecase.NewTodoUsecase(todoRepo, todoCreateBulkCommandTxManager)
+	// funcs := handler.NewInitTodoRouterFunc(todoUsecase)
+	// funcs(v1, authMiddleware)
 
 	// run
 	readHeaderTimeout := time.Duration(cfg.Server.ReadHeaderTimeoutSec) * time.Second
