@@ -1,7 +1,6 @@
 package usecase_test
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
@@ -67,7 +66,7 @@ func Test_AuthenticateCommand_Execute_shouldReturnError_whenLoginIDFormatIsInval
 			require.Error(t, err)
 			assert.Nil(t, output)
 			assert.Contains(t, err.Error(), "authenticate user")
-			assert.True(t, errors.Is(err, domain.ErrUnauthenticated))
+			assert.ErrorIs(t, err, domain.ErrUnauthenticated)
 		})
 	}
 }
@@ -87,7 +86,7 @@ func Test_AuthenticateCommand_Execute_shouldReturnError_whenPasswordFormatIsInva
 	require.Error(t, err)
 	assert.Nil(t, output)
 	assert.Contains(t, err.Error(), "authenticate user")
-	assert.True(t, errors.Is(err, domain.ErrUnauthenticated))
+	assert.ErrorIs(t, err, domain.ErrUnauthenticated)
 }
 
 func Test_AuthenticateCommand_Execute_shouldReturnError_whenCredentialsMismatch(t *testing.T) {
@@ -105,7 +104,7 @@ func Test_AuthenticateCommand_Execute_shouldReturnError_whenCredentialsMismatch(
 	require.Error(t, err)
 	assert.Nil(t, output)
 	assert.Contains(t, err.Error(), "authenticate user")
-	assert.True(t, errors.Is(err, domain.ErrUnauthenticated))
+	assert.ErrorIs(t, err, domain.ErrUnauthenticated)
 }
 
 func Test_AuthenticateCommand_Execute_shouldReturnError_whenCreateTokenFails(t *testing.T) {
@@ -125,5 +124,5 @@ func Test_AuthenticateCommand_Execute_shouldReturnError_whenCreateTokenFails(t *
 	require.Error(t, err)
 	assert.Nil(t, output)
 	assert.Contains(t, err.Error(), "create JWT")
-	assert.False(t, errors.Is(err, domain.ErrUnauthenticated))
+	assert.NotErrorIs(t, err, domain.ErrUnauthenticated)
 }
