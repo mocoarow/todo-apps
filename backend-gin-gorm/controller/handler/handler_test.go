@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/handler"
@@ -17,5 +18,5 @@ func TestMain(m *testing.M) {
 		Log:   &handler.LogConfig{},
 		Debug: &handler.DebugConfig{},
 	}
-	m.Run()
+	os.Exit(m.Run())
 }

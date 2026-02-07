@@ -18,7 +18,7 @@ type ServerConfig struct {
 	HTTPPort             int                        `yaml:"httpPort" validate:"required"`
 	MetricsPort          int                        `yaml:"metricsPort" validate:"required"`
 	ReadHeaderTimeoutSec int                        `yaml:"readHeaderTimeoutSec" validate:"gte=1"`
-	Gin                  *handler.Config             `yaml:"gin" validate:"required"`
+	Gin                  *handler.Config            `yaml:"gin" validate:"required"`
 	Shutdown             *controller.ShutdownConfig `yaml:"shutdown" validate:"required"`
 }
 

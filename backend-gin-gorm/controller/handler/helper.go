@@ -10,11 +10,6 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/api"
 )
 
-const (
-	// ContextFieldUserID is the gin context key for the authenticated user's ID.
-	ContextFieldUserID = "userId"
-)
-
 // InitRouterGroupFunc is a function that registers routes under a parent router group with optional middleware.
 type InitRouterGroupFunc func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc)
 

@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/api"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
@@ -28,7 +29,7 @@ func NewCreateBulkTodosResponse(todos []*domain.Todo) (*api.CreateBulkTodosRespo
 // CreateBulkTodos handles POST /todo/bulk and creates multiple todos at once for the authenticated user.
 func (h *TodoHandler) CreateBulkTodos(c *gin.Context) {
 	ctx := c.Request.Context()
-	userID := c.GetInt(ContextFieldUserID)
+	userID := c.GetInt(controller.ContextFieldUserID{})
 	if userID <= 0 {
 		h.logger.WarnContext(ctx, "unauthorized: missing or invalid user ID")
 		c.JSON(http.StatusUnauthorized, NewErrorResponse("unauthorized", http.StatusText(http.StatusUnauthorized)))

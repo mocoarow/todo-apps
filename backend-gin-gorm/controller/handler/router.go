@@ -11,7 +11,7 @@ import (
 	sloggin "github.com/samber/slog-gin"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
-	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/handler/middleware"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/middleware"
 )
 
 type LogConfig struct {
