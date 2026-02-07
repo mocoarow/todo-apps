@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/api"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
@@ -45,7 +46,7 @@ func (h *TodoHandler) UpdateTodo(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetInt(ContextFieldUserID)
+	userID := c.GetInt(controller.ContextFieldUserID{})
 	if userID <= 0 {
 		h.logger.WarnContext(ctx, "unauthorized: missing or invalid user ID")
 		c.JSON(http.StatusUnauthorized, NewErrorResponse("unauthorized", http.StatusText(http.StatusUnauthorized)))

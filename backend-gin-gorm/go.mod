@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-playground/validator/v10 v10.29.0
 	github.com/go-sql-driver/mysql v1.9.3
+	github.com/ohler55/ojg v1.28.0
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/remychantenay/slog-otel v1.3.4
@@ -78,6 +79,7 @@ require (
 	github.com/quic-go/quic-go v0.57.1 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/api"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
@@ -38,7 +39,7 @@ func NewFindTodoResponse(todos []*domain.Todo) (*api.FindTodoResponse, error) {
 	for _, todo := range todos {
 		todoResp, err := NewFindTodoResponseTodo(todo)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("convert todo: %w", err)
 		}
 		resp.Todos = append(resp.Todos, *todoResp)
 	}
@@ -48,7 +49,7 @@ func NewFindTodoResponse(todos []*domain.Todo) (*api.FindTodoResponse, error) {
 // FindTodos handles GET /todo and returns all todos for the authenticated user.
 func (h *TodoHandler) FindTodos(c *gin.Context) {
 	ctx := c.Request.Context()
-	userID := c.GetInt(ContextFieldUserID)
+	userID := c.GetInt(controller.ContextFieldUserID{})
 	if userID <= 0 {
 		h.logger.WarnContext(ctx, "unauthorized: missing or invalid user ID")
 		c.JSON(http.StatusUnauthorized, NewErrorResponse("unauthorized", http.StatusText(http.StatusUnauthorized)))
