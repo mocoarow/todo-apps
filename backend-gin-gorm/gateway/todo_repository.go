@@ -11,6 +11,7 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// TodoEntity is the GORM model for the "todo" table.
 type TodoEntity struct {
 	ID         int       `gorm:"primaryKey;autoIncrement"`
 	UserID     int       `gorm:"not null"`
@@ -33,6 +34,7 @@ func (e *TodoEntity) toTodo() (*domain.Todo, error) {
 	return todo, nil
 }
 
+// TodoEntities is a slice of TodoEntity with batch conversion support.
 type TodoEntities []TodoEntity
 
 func (e TodoEntities) toTodos() ([]domain.Todo, error) {
@@ -48,16 +50,19 @@ func (e TodoEntities) toTodos() ([]domain.Todo, error) {
 	return todos, nil
 }
 
+// TodoRepository implements domain.TodoRepository using GORM.
 type TodoRepository struct {
 	db *gorm.DB
 }
 
+// NewTodoRepository returns a new TodoRepository backed by the given GORM DB.
 func NewTodoRepository(db *gorm.DB) *TodoRepository {
 	return &TodoRepository{
 		db: db,
 	}
 }
 
+// FindTodos returns all todos for the given user, ordered by ID.
 func (r *TodoRepository) FindTodos(ctx context.Context, userID int) ([]domain.Todo, error) {
 	var entities TodoEntities
 	if result := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("id").Find(&entities); result.Error != nil {
@@ -70,6 +75,7 @@ func (r *TodoRepository) FindTodos(ctx context.Context, userID int) ([]domain.To
 	return todos, nil
 }
 
+// CreateTodo inserts a new todo record and returns the created domain model.
 func (r *TodoRepository) CreateTodo(ctx context.Context, input *domain.CreateTodoInput) (*domain.Todo, error) {
 	entity := &TodoEntity{ //nolint:exhaustruct
 		UserID:     input.UserID,
@@ -93,6 +99,7 @@ func (r *TodoRepository) CreateTodo(ctx context.Context, input *domain.CreateTod
 	return todo, nil
 }
 
+// UpdateTodo updates a todo owned by the user. Returns ErrTodoNotFound if not found.
 func (r *TodoRepository) UpdateTodo(ctx context.Context, input *domain.UpdateTodoInput) (*domain.Todo, error) {
 	var entity TodoEntity
 
@@ -121,6 +128,7 @@ func (r *TodoRepository) UpdateTodo(ctx context.Context, input *domain.UpdateTod
 	return todo, nil
 }
 
+// DeleteTodo deletes a todo owned by the user. Returns ErrTodoNotFound if not found.
 func (r *TodoRepository) DeleteTodo(ctx context.Context, input *domain.DeleteTodoInput) error {
 	// Delete the todo by ID and UserID to ensure the user owns this todo
 	result := r.db.WithContext(ctx).Where("id = ? AND user_id = ?", input.ID, input.UserID).Delete(&TodoEntity{}) //nolint:exhaustruct
@@ -136,16 +144,19 @@ func (r *TodoRepository) DeleteTodo(ctx context.Context, input *domain.DeleteTod
 	return nil
 }
 
+// TodoCreateBulkCommandTxManager manages GORM transactions for bulk todo creation.
 type TodoCreateBulkCommandTxManager struct {
 	dbc *DBConnection
 }
 
+// NewTodoCreateBulkCommandTxManager returns a new transaction manager.
 func NewTodoCreateBulkCommandTxManager(dbc *DBConnection) *TodoCreateBulkCommandTxManager {
 	return &TodoCreateBulkCommandTxManager{
 		dbc: dbc,
 	}
 }
 
+// WithTransaction executes fn within a database transaction, rolling back on error.
 func (tm *TodoCreateBulkCommandTxManager) WithTransaction(ctx context.Context, fn func(todoRepo domain.TodoRepository) ([]domain.Todo, error)) ([]domain.Todo, error) {
 	var todos []domain.Todo
 	err := tm.dbc.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {

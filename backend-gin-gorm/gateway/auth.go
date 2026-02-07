@@ -9,6 +9,7 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// AuthConfig holds JWT signing key and token TTL settings.
 type AuthConfig struct {
 	SigningKey        string `yaml:"signingKey" validate:"required,min=32"`
 	AccessTokenTTLMin int    `yaml:"accessTokenTtlMin" validate:"gte=1"`
@@ -20,12 +21,14 @@ type userClaims struct {
 	jwt.RegisteredClaims
 }
 
+// AuthTokenManager implements JWT token creation and parsing using HMAC signing.
 type AuthTokenManager struct {
 	signingKey    []byte
 	signingMethod jwt.SigningMethod
 	tokenTimeout  time.Duration
 }
 
+// NewAuthTokenManager returns a new AuthTokenManager with the given signing parameters.
 func NewAuthTokenManager(signingKey []byte, signingMethod jwt.SigningMethod, tokenTimeout time.Duration) *AuthTokenManager {
 	return &AuthTokenManager{
 		signingKey:    signingKey,
@@ -34,6 +37,7 @@ func NewAuthTokenManager(signingKey []byte, signingMethod jwt.SigningMethod, tok
 	}
 }
 
+// CreateToken generates a signed JWT for the given user.
 func (m *AuthTokenManager) CreateToken(loginID string, userID int) (string, error) {
 	accessToken, err := m.createJWT(loginID, userID, m.tokenTimeout)
 	if err != nil {
@@ -43,6 +47,7 @@ func (m *AuthTokenManager) CreateToken(loginID string, userID int) (string, erro
 	return accessToken, nil
 }
 
+// ParseToken validates a JWT string and returns the embedded user info.
 func (m *AuthTokenManager) ParseToken(tokenString string) (*domain.UserInfo, error) {
 	claims, err := m.parseToken(tokenString)
 	if err != nil {

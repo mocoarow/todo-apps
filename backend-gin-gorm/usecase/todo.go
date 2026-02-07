@@ -8,6 +8,7 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// TodoUsecase orchestrates todo CRUD operations via command/query objects.
 type TodoUsecase struct {
 	findTodosQuery         *FindTodosQuery
 	createTodoCommand      *CreateTodoCommand
@@ -17,6 +18,7 @@ type TodoUsecase struct {
 	logger                 *slog.Logger
 }
 
+// NewTodoUsecase returns a new TodoUsecase wired with the given repository and transaction manager.
 func NewTodoUsecase(repo domain.TodoRepository, createBulkCommandTxManager TodoCreateBulkCommandTxManager) *TodoUsecase {
 	findTodosQuery := NewFindTodosQuery(repo)
 	createTodoCommand := NewCreateTodoCommand(repo)
@@ -33,6 +35,7 @@ func NewTodoUsecase(repo domain.TodoRepository, createBulkCommandTxManager TodoC
 	}
 }
 
+// FindTodos returns all todos belonging to the given user.
 func (u *TodoUsecase) FindTodos(ctx context.Context, userID int) ([]domain.Todo, error) {
 	ctx, span := tracer.Start(ctx, "FindTodos")
 	defer span.End()
@@ -45,6 +48,7 @@ func (u *TodoUsecase) FindTodos(ctx context.Context, userID int) ([]domain.Todo,
 	return todos, nil
 }
 
+// CreateTodo creates a single todo item.
 func (u *TodoUsecase) CreateTodo(ctx context.Context, input *domain.CreateTodoInput) (*domain.CreateTodoOutput, error) {
 	output, err := u.createTodoCommand.Execute(ctx, input)
 	if err != nil {
@@ -53,6 +57,7 @@ func (u *TodoUsecase) CreateTodo(ctx context.Context, input *domain.CreateTodoIn
 	return output, nil
 }
 
+// CreateBulkTodos creates multiple todo items within a single transaction.
 func (u *TodoUsecase) CreateBulkTodos(ctx context.Context, input *domain.CreateBulkTodosInput) (*domain.CreateBulkTodosOutput, error) {
 	output, err := u.createBulkTodosCommand.Execute(ctx, input)
 	if err != nil {
@@ -61,6 +66,7 @@ func (u *TodoUsecase) CreateBulkTodos(ctx context.Context, input *domain.CreateB
 	return output, nil
 }
 
+// UpdateTodo updates an existing todo item.
 func (u *TodoUsecase) UpdateTodo(ctx context.Context, input *domain.UpdateTodoInput) (*domain.UpdateTodoOutput, error) {
 	output, err := u.updateTodoCommand.Execute(ctx, input)
 	if err != nil {
@@ -69,6 +75,7 @@ func (u *TodoUsecase) UpdateTodo(ctx context.Context, input *domain.UpdateTodoIn
 	return output, nil
 }
 
+// DeleteTodo removes a todo item.
 func (u *TodoUsecase) DeleteTodo(ctx context.Context, input *domain.DeleteTodoInput) error {
 	err := u.deleteTodoCommand.Execute(ctx, input)
 	if err != nil {

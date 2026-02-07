@@ -8,16 +8,19 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// AuthTokenCreator creates a JWT token for authenticated users.
 type AuthTokenCreator interface {
 	CreateToken(loginID string, userID int) (string, error)
 }
 
+// AuthenticateCommand handles user credential validation and token issuance.
 type AuthenticateCommand struct {
 	authTokenCreator AuthTokenCreator
 	regexpUserID     *regexp.Regexp
 	regexpPassword   *regexp.Regexp
 }
 
+// NewAuthenticateCommand returns a new AuthenticateCommand.
 func NewAuthenticateCommand(authTokenCreator AuthTokenCreator) *AuthenticateCommand {
 	return &AuthenticateCommand{
 		authTokenCreator: authTokenCreator,
@@ -26,6 +29,7 @@ func NewAuthenticateCommand(authTokenCreator AuthTokenCreator) *AuthenticateComm
 	}
 }
 
+// Execute validates the login credentials and returns an access token on success.
 func (c *AuthenticateCommand) Execute(input *domain.AuthenticateInput) (*domain.AuthenticateOutput, error) {
 	userID, err := c.authenticate(input.LoginID, input.Password)
 	if err != nil {

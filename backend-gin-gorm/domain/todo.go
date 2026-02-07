@@ -162,6 +162,7 @@ func NewDeleteTodoInput(id int, userID int) (*DeleteTodoInput, error) {
 	return m, nil
 }
 
+// TodoRepository defines persistence operations for todo items.
 type TodoRepository interface {
 	FindTodos(ctx context.Context, userID int) ([]Todo, error)
 	CreateTodo(ctx context.Context, input *CreateTodoInput) (*Todo, error)

@@ -1,3 +1,4 @@
+// Package middleware provides Gin middleware for authentication, metrics collection, and debugging.
 package middleware
 
 import (

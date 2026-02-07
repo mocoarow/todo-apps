@@ -7,20 +7,24 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// TodoCreateBulkCommandTxManager manages database transactions for bulk todo creation.
 type TodoCreateBulkCommandTxManager interface {
 	WithTransaction(ctx context.Context, fn func(todoRepo domain.TodoRepository) ([]domain.Todo, error)) ([]domain.Todo, error)
 }
 
+// CreateBulkTodosCommand creates multiple todos within a single transaction.
 type CreateBulkTodosCommand struct {
 	txManager TodoCreateBulkCommandTxManager
 }
 
+// NewCreateBulkTodosCommand returns a new CreateBulkTodosCommand.
 func NewCreateBulkTodosCommand(txManager TodoCreateBulkCommandTxManager) *CreateBulkTodosCommand {
 	return &CreateBulkTodosCommand{
 		txManager: txManager,
 	}
 }
 
+// Execute creates all todos from input in a single transaction. It rolls back on any failure.
 func (u *CreateBulkTodosCommand) Execute(ctx context.Context, input *domain.CreateBulkTodosInput) (*domain.CreateBulkTodosOutput, error) {
 	todos, err := u.txManager.WithTransaction(ctx, func(todoRepo domain.TodoRepository) ([]domain.Todo, error) {
 		var todos []domain.Todo

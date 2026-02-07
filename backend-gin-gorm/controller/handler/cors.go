@@ -4,12 +4,14 @@ import (
 	"github.com/gin-contrib/cors"
 )
 
+// CORSConfig holds allowed origins, methods, and headers as comma-separated strings.
 type CORSConfig struct {
 	AllowOrigins string `yaml:"allowOrigins" validate:"required"`
 	AllowMethods string `yaml:"allowMethods" validate:"required"`
 	AllowHeaders string `yaml:"allowHeaders"`
 }
 
+// InitCORS converts CORSConfig into a gin-contrib/cors.Config.
 func InitCORS(cfg *CORSConfig) cors.Config {
 	allowOrigins := SplitCommaSeparated(cfg.AllowOrigins)
 	allowMethods := SplitCommaSeparated(cfg.AllowMethods)

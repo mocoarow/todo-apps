@@ -16,17 +16,21 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// DialectMySQL implements DialectRDBMS for MySQL.
 type DialectMySQL struct {
 }
 
+// Name returns the dialect name "mysql".
 func (d *DialectMySQL) Name() string {
 	return "mysql"
 }
 
+// BoolDefaultValue returns "0" as MySQL's false representation.
 func (d *DialectMySQL) BoolDefaultValue() string {
 	return "0"
 }
 
+// MySQLConfig holds MySQL connection parameters.
 type MySQLConfig struct {
 	Username string `yaml:"username" validate:"required"`
 	Password string `yaml:"password" validate:"required"`
@@ -54,6 +58,7 @@ func initDBMySQL(ctx context.Context, cfg *DBConfig, logLevel slog.Level, appNam
 	return &dialect, db, sqlDB, nil
 }
 
+// OpenMySQLWithDSN opens a GORM MySQL connection using a raw DSN string.
 func OpenMySQLWithDSN(dsn string, logLevel slog.Level, appName string) (*gorm.DB, error) {
 	gormDialector := gorm_mysql.Open(dsn)
 
@@ -79,6 +84,7 @@ func OpenMySQLWithDSN(dsn string, logLevel slog.Level, appName string) (*gorm.DB
 	return db, nil
 }
 
+// OpenMySQL opens a GORM MySQL connection using the given config.
 func OpenMySQL(cfg *MySQLConfig, logLevel slog.Level, appName string) (*gorm.DB, error) {
 	c := mysql.Config{ //nolint:exhaustruct
 		DBName:               cfg.Database,
