@@ -1,0 +1,42 @@
+---
+name: Check TypeScript
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "frontend-react-zustand/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend-react-zustand/**"
+permissions: {}
+jobs:
+  check:
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    strategy:
+      matrix:
+        workdir:
+          - frontend-react-zustand
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: ${{ matrix.workdir }}/package-lock.json
+
+      - run: npm ci
+        working-directory: ${{ matrix.workdir }}
+
+      - run: npm run check
+        working-directory: ${{ matrix.workdir }}
