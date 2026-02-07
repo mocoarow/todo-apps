@@ -13,8 +13,8 @@ const (
 
 // AuthenticateRequest defines model for AuthenticateRequest.
 type AuthenticateRequest struct {
-	LoginID  string `json:"loginId"`
-	Password string `json:"password"`
+	LoginID  string `binding:"required,max=100" json:"loginId"`
+	Password string `binding:"required,min=8,max=20" json:"password"`
 }
 
 // AuthenticateResponse defines model for AuthenticateResponse.
@@ -34,7 +34,7 @@ type CreateBulkTodosResponse struct {
 
 // CreateTodoRequest defines model for CreateTodoRequest.
 type CreateTodoRequest struct {
-	Text string `json:"text"`
+	Text string `binding:"required,max=250" json:"text"`
 }
 
 // CreateTodoResponse defines model for CreateTodoResponse.
@@ -69,7 +69,7 @@ type FindTodoResponseTodo struct {
 // UpdateTodoRequest defines model for UpdateTodoRequest.
 type UpdateTodoRequest struct {
 	IsComplete bool   `json:"isComplete"`
-	Text       string `json:"text"`
+	Text       string `binding:"required,max=250" json:"text"`
 }
 
 // UpdateTodoResponse defines model for UpdateTodoResponse.

@@ -1,6 +1,7 @@
 package middleware_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -33,6 +34,7 @@ func setupRouter(t *testing.T, authUsecase middleware.AuthUsecase) *gin.Engine {
 
 func Test_AuthMiddleware_shouldReturn200AndSetUserID_whenValidBearerToken(t *testing.T) {
 	t.Parallel()
+	ctx := context.Background()
 
 	// given
 	userInfo, err := domain.NewUserInfo(42, "user42")
@@ -46,7 +48,7 @@ func Test_AuthMiddleware_shouldReturn200AndSetUserID_whenValidBearerToken(t *tes
 	w := httptest.NewRecorder()
 
 	// when
-	req, err := http.NewRequest(http.MethodGet, "/protected", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/protected", nil)
 	require.NoError(t, err)
 	req.Header.Set("Authorization", "Bearer valid-token")
 	r.ServeHTTP(w, req)
@@ -58,6 +60,7 @@ func Test_AuthMiddleware_shouldReturn200AndSetUserID_whenValidBearerToken(t *tes
 
 func Test_AuthMiddleware_shouldReturn401_whenAuthorizationHeaderIsMissing(t *testing.T) {
 	t.Parallel()
+	ctx := context.Background()
 
 	// given
 	mockUsecase := NewMockAuthUsecase(t)
@@ -65,7 +68,7 @@ func Test_AuthMiddleware_shouldReturn401_whenAuthorizationHeaderIsMissing(t *tes
 	w := httptest.NewRecorder()
 
 	// when
-	req, err := http.NewRequest(http.MethodGet, "/protected", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/protected", nil)
 	require.NoError(t, err)
 	r.ServeHTTP(w, req)
 
@@ -75,14 +78,14 @@ func Test_AuthMiddleware_shouldReturn401_whenAuthorizationHeaderIsMissing(t *tes
 
 func Test_AuthMiddleware_shouldReturn401_whenAuthorizationHeaderIsNotBearer(t *testing.T) {
 	t.Parallel()
-
+	ctx := context.Background()
 	// given
 	mockUsecase := NewMockAuthUsecase(t)
 	r := setupRouter(t, mockUsecase)
 	w := httptest.NewRecorder()
 
 	// when
-	req, err := http.NewRequest(http.MethodGet, "/protected", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/protected", nil)
 	require.NoError(t, err)
 	req.Header.Set("Authorization", "Basic dXNlcjpwYXNz")
 	r.ServeHTTP(w, req)
@@ -93,7 +96,7 @@ func Test_AuthMiddleware_shouldReturn401_whenAuthorizationHeaderIsNotBearer(t *t
 
 func Test_AuthMiddleware_shouldReturn401_whenGetUserInfoReturnsError(t *testing.T) {
 	t.Parallel()
-
+	ctx := context.Background()
 	// given
 	mockUsecase := NewMockAuthUsecase(t)
 	mockUsecase.EXPECT().GetUserInfo(mock.Anything).Return(nil, fmt.Errorf("invalid token")).Once()
@@ -101,7 +104,7 @@ func Test_AuthMiddleware_shouldReturn401_whenGetUserInfoReturnsError(t *testing.
 	w := httptest.NewRecorder()
 
 	// when
-	req, err := http.NewRequest(http.MethodGet, "/protected", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/protected", nil)
 	require.NoError(t, err)
 	req.Header.Set("Authorization", "Bearer invalid-token")
 	r.ServeHTTP(w, req)

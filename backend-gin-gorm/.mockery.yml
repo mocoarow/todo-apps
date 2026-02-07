@@ -15,6 +15,7 @@ packages:
   github.com/mocoarow/todo-apps/backend-gin-gorm/controller/handler:
     interfaces:
       TodoUsecase:
+      AuthUsecase:
   github.com/mocoarow/todo-apps/backend-gin-gorm/controller/middleware:
     interfaces:
       AuthUsecase:

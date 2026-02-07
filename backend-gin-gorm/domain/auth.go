@@ -1,6 +1,12 @@
 package domain
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+// ErrUnauthenticated is returned when authentication fails due to invalid credentials.
+var ErrUnauthenticated = errors.New("unauthenticated")
 
 type AuthenticateInput struct {
 	LoginID  string `validate:"required"`
