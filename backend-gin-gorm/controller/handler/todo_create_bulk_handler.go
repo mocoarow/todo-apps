@@ -12,12 +12,12 @@ import (
 )
 
 // NewCreateBulkTodosResponse converts a slice of domain Todos to a CreateBulkTodosResponse API type.
-func NewCreateBulkTodosResponse(todos []*domain.Todo) (*api.CreateBulkTodosResponse, error) {
+func NewCreateBulkTodosResponse(todos []domain.Todo) (*api.CreateBulkTodosResponse, error) {
 	resp := &api.CreateBulkTodosResponse{
 		Todos: make([]api.CreateTodoResponse, 0, len(todos)),
 	}
 	for _, todo := range todos {
-		todoResp, err := NewCreateTodoResponse(todo)
+		todoResp, err := NewCreateTodoResponse(&todo)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +44,7 @@ func (h *TodoHandler) CreateBulkTodos(c *gin.Context) {
 		return
 	}
 
-	todoInputs := make([]*domain.CreateTodoInput, len(req.Todos))
+	todoInputs := make([]domain.CreateTodoInput, len(req.Todos))
 	for i, reqTodo := range req.Todos {
 		input, err := domain.NewCreateTodoInput(userID, reqTodo.Text)
 		if err != nil {
@@ -52,7 +52,7 @@ func (h *TodoHandler) CreateBulkTodos(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, NewErrorResponse("invalid_request", "request body is invalid"))
 			return
 		}
-		todoInputs[i] = input
+		todoInputs[i] = *input
 	}
 
 	bulkInput, err := domain.NewCreateBulkTodosInput(userID, todoInputs)

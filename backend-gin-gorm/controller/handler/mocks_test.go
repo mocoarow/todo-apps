@@ -232,23 +232,23 @@ func (_c *MockTodoUsecase_DeleteTodo_Call) RunAndReturn(run func(ctx context.Con
 }
 
 // FindTodos provides a mock function for the type MockTodoUsecase
-func (_mock *MockTodoUsecase) FindTodos(ctx context.Context, userID int) ([]*domain.Todo, error) {
+func (_mock *MockTodoUsecase) FindTodos(ctx context.Context, userID int) ([]domain.Todo, error) {
 	ret := _mock.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindTodos")
 	}
 
-	var r0 []*domain.Todo
+	var r0 []domain.Todo
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]*domain.Todo, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]domain.Todo, error)); ok {
 		return returnFunc(ctx, userID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []*domain.Todo); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []domain.Todo); ok {
 		r0 = returnFunc(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*domain.Todo)
+			r0 = ret.Get(0).([]domain.Todo)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
@@ -289,12 +289,12 @@ func (_c *MockTodoUsecase_FindTodos_Call) Run(run func(ctx context.Context, user
 	return _c
 }
 
-func (_c *MockTodoUsecase_FindTodos_Call) Return(todos []*domain.Todo, err error) *MockTodoUsecase_FindTodos_Call {
+func (_c *MockTodoUsecase_FindTodos_Call) Return(todos []domain.Todo, err error) *MockTodoUsecase_FindTodos_Call {
 	_c.Call.Return(todos, err)
 	return _c
 }
 
-func (_c *MockTodoUsecase_FindTodos_Call) RunAndReturn(run func(ctx context.Context, userID int) ([]*domain.Todo, error)) *MockTodoUsecase_FindTodos_Call {
+func (_c *MockTodoUsecase_FindTodos_Call) RunAndReturn(run func(ctx context.Context, userID int) ([]domain.Todo, error)) *MockTodoUsecase_FindTodos_Call {
 	_c.Call.Return(run)
 	return _c
 }

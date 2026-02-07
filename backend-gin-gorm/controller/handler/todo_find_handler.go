@@ -32,12 +32,12 @@ func NewFindTodoResponseTodo(todo *domain.Todo) (*api.FindTodoResponseTodo, erro
 }
 
 // NewFindTodoResponse converts a slice of domain Todos to a FindTodoResponse API type.
-func NewFindTodoResponse(todos []*domain.Todo) (*api.FindTodoResponse, error) {
+func NewFindTodoResponse(todos []domain.Todo) (*api.FindTodoResponse, error) {
 	resp := &api.FindTodoResponse{
 		Todos: make([]api.FindTodoResponseTodo, 0, len(todos)),
 	}
 	for _, todo := range todos {
-		todoResp, err := NewFindTodoResponseTodo(todo)
+		todoResp, err := NewFindTodoResponseTodo(&todo)
 		if err != nil {
 			return nil, fmt.Errorf("convert todo: %w", err)
 		}

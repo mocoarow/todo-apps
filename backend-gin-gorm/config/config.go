@@ -23,8 +23,9 @@ type ServerConfig struct {
 }
 
 type Config struct {
-	Server *ServerConfig     `yaml:"server" validate:"required"`
-	DB     *gateway.DBConfig `yaml:"db" validate:"required"`
+	Server *ServerConfig      `yaml:"server" validate:"required"`
+	DB     *gateway.DBConfig  `yaml:"db" validate:"required"`
+	Log    *gateway.LogConfig `yaml:"log" validate:"required"`
 }
 
 //go:embed config.yml

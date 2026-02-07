@@ -20,7 +20,7 @@ func Test_TodoHandler_FindTodos_shouldReturn200_whenUsecaseReturnsTodos(t *testi
 	// given
 	userID := randomUserID()
 	todoUsecase := NewMockTodoUsecase(t)
-	todoUsecase.EXPECT().FindTodos(mock.Anything, userID).Return([]*domain.Todo{
+	todoUsecase.EXPECT().FindTodos(mock.Anything, userID).Return([]domain.Todo{
 		{
 			ID:         userID,
 			Text:       "task A",
@@ -95,7 +95,7 @@ func Test_TodoHandler_FindTodos_shouldReturn500_whenUsecaseReturnsInvalidTodos(t
 	// given
 	userID := randomUserID()
 	todoUsecase := NewMockTodoUsecase(t)
-	todoUsecase.EXPECT().FindTodos(mock.Anything, userID).Return([]*domain.Todo{nil}, nil).Once()
+	todoUsecase.EXPECT().FindTodos(mock.Anything, userID).Return([]domain.Todo{{}}, nil).Once()
 	r := initTodoRouter(t, ctx, todoUsecase, userID)
 	w := httptest.NewRecorder()
 

@@ -13,6 +13,7 @@ type DBConfig struct {
 	DriverName string       `yaml:"driverName"`
 	MySQL      *MySQLConfig `yaml:"mysql"`
 }
+
 type DBConnection struct {
 	DriverName string
 	Dialect    DialectRDBMS

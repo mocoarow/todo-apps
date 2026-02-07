@@ -35,14 +35,14 @@ func (e *TodoEntity) toTodo() (*domain.Todo, error) {
 
 type TodoEntities []TodoEntity
 
-func (e TodoEntities) toTodos() ([]*domain.Todo, error) {
-	todos := make([]*domain.Todo, len(e))
+func (e TodoEntities) toTodos() ([]domain.Todo, error) {
+	todos := make([]domain.Todo, len(e))
 	for i, todoE := range e {
 		todo, err := todoE.toTodo()
 		if err != nil {
 			return nil, fmt.Errorf("to todo: %w", err)
 		}
-		todos[i] = todo
+		todos[i] = *todo
 	}
 
 	return todos, nil
@@ -58,7 +58,7 @@ func NewTodoRepository(db *gorm.DB) *TodoRepository {
 	}
 }
 
-func (r *TodoRepository) FindTodos(ctx context.Context, userID int) ([]*domain.Todo, error) {
+func (r *TodoRepository) FindTodos(ctx context.Context, userID int) ([]domain.Todo, error) {
 	var entities TodoEntities
 	if result := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("id").Find(&entities); result.Error != nil {
 		return nil, fmt.Errorf("find todos: %w", result.Error)
@@ -134,4 +134,31 @@ func (r *TodoRepository) DeleteTodo(ctx context.Context, input *domain.DeleteTod
 	}
 
 	return nil
+}
+
+type TodoCreateBulkCommandTxManager struct {
+	dbc *DBConnection
+}
+
+func NewTodoCreateBulkCommandTxManager(dbc *DBConnection) *TodoCreateBulkCommandTxManager {
+	return &TodoCreateBulkCommandTxManager{
+		dbc: dbc,
+	}
+}
+
+func (tm *TodoCreateBulkCommandTxManager) Do1(ctx context.Context, fn func(todoRepo domain.TodoRepository) ([]domain.Todo, error)) ([]domain.Todo, error) {
+	var todos []domain.Todo
+	err := tm.dbc.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		todoRepo := NewTodoRepository(tx)
+		var err error
+		todos, err = fn(todoRepo)
+		if err != nil {
+			return fmt.Errorf("execute function in transaction: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("transaction failed: %w", err)
+	}
+	return todos, nil
 }

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -73,12 +74,12 @@ func NewCreateTodoOutput(todo *Todo) (*CreateTodoOutput, error) {
 
 // CreateBulkTodosInput holds the parameters required to create multiple todos at once (1-100 items).
 type CreateBulkTodosInput struct {
-	UserID int                `validate:"required,gt=0"`
-	Todos  []*CreateTodoInput `validate:"required,min=1,max=100,dive"`
+	UserID int               `validate:"required,gt=0"`
+	Todos  []CreateTodoInput `validate:"required,min=1,max=100,dive"`
 }
 
 // NewCreateBulkTodosInput creates a validated CreateBulkTodosInput. Returns an error if validation fails.
-func NewCreateBulkTodosInput(userID int, todos []*CreateTodoInput) (*CreateBulkTodosInput, error) {
+func NewCreateBulkTodosInput(userID int, todos []CreateTodoInput) (*CreateBulkTodosInput, error) {
 	m := &CreateBulkTodosInput{
 		UserID: userID,
 		Todos:  todos,
@@ -91,11 +92,11 @@ func NewCreateBulkTodosInput(userID int, todos []*CreateTodoInput) (*CreateBulkT
 
 // CreateBulkTodosOutput holds the result of a bulk todo creation.
 type CreateBulkTodosOutput struct {
-	Todos []*Todo `validate:"required,min=1,dive"`
+	Todos []Todo `validate:"required,min=1,dive"`
 }
 
 // NewCreateBulkTodosOutput creates a validated CreateBulkTodosOutput. Returns an error if validation fails.
-func NewCreateBulkTodosOutput(todos []*Todo) (*CreateBulkTodosOutput, error) {
+func NewCreateBulkTodosOutput(todos []Todo) (*CreateBulkTodosOutput, error) {
 	m := &CreateBulkTodosOutput{
 		Todos: todos,
 	}
@@ -159,4 +160,11 @@ func NewDeleteTodoInput(id int, userID int) (*DeleteTodoInput, error) {
 		return nil, fmt.Errorf("validate delete todo input: %w", err)
 	}
 	return m, nil
+}
+
+type TodoRepository interface {
+	FindTodos(ctx context.Context, userID int) ([]Todo, error)
+	CreateTodo(ctx context.Context, input *CreateTodoInput) (*Todo, error)
+	UpdateTodo(ctx context.Context, input *UpdateTodoInput) (*Todo, error)
+	DeleteTodo(ctx context.Context, input *DeleteTodoInput) error
 }
