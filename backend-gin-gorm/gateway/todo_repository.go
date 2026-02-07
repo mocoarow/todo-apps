@@ -146,7 +146,7 @@ func NewTodoCreateBulkCommandTxManager(dbc *DBConnection) *TodoCreateBulkCommand
 	}
 }
 
-func (tm *TodoCreateBulkCommandTxManager) Do1(ctx context.Context, fn func(todoRepo domain.TodoRepository) ([]domain.Todo, error)) ([]domain.Todo, error) {
+func (tm *TodoCreateBulkCommandTxManager) WithTransaction(ctx context.Context, fn func(todoRepo domain.TodoRepository) ([]domain.Todo, error)) ([]domain.Todo, error) {
 	var todos []domain.Todo
 	err := tm.dbc.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		todoRepo := NewTodoRepository(tx)

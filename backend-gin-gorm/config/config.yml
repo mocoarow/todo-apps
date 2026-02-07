@@ -18,7 +18,6 @@ server:
   shutdown:
     timeSec1: ${SHUTDOWN_TIME_SEC1:-1}
     timeSec2: ${SHUTDOWN_TIME_SEC2:-1}
-
 db:
   driverName: ${APP_DB_DRIVER_NAME:-mysql}
   mysql:
@@ -27,3 +26,15 @@ db:
     host: ${MYSQL_HOST:-127.0.0.1}
     port: ${MYSQL_PORT:-3306}
     database: ${MYSQL_DATABASE:-local}
+auth:
+  signingKey: ${AUTH_SIGNING_KEY}
+  accessTokenTtlMin: ${AUTH_ACCESS_TOKEN_TTL_MIN:-60}
+log:
+  level: ${LOG_LEVEL:-info}
+  exporter: ${LOG_EXPORTER:-none}
+  otlp:
+    endpoint: ${LOG_OTLP_ENDPOINT:-localhost:4318}
+    insecure: ${LOG_OTLP_INSECURE:-true}
+  uptrace:
+    endpoint: ${LOG_UPTRACE_ENDPOINT:-api.uptrace.dev}
+    dsn: ${LOG_UPTRACE_DSN:-dummy}
