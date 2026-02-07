@@ -1,0 +1,35 @@
+---
+name: Test Go
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "backend-gin-gorm/**"
+permissions: {}
+jobs:
+  golang:
+    strategy:
+      matrix:
+        workdir:
+          - backend-gin-gorm
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ matrix.workdir }}/go.mod
+
+      # https://github.com/arduino/setup-task/tree/v2.0.0
+      - uses: arduino/setup-task@416adbf11f87bcbb45c2d4b46af25b569c0ed2df
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: go install github.com/jandelgado/gcov2lcov@latest
+
+      - run: task test
+        working-directory: ${{ matrix.workdir }}
