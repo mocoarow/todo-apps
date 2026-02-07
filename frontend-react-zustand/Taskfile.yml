@@ -53,4 +53,5 @@ tasks:
     desc: "Generate OpenAPI models using openapi-typescript"
     cmds:
       - mkdir -p src/api
-      - npx openapi-typescript ../openapi/openapi.yaml -o src/api/types.d.ts
+      - rm -f src/api/types.gen.ts
+      - npx openapi-typescript ../openapi/openapi.yaml -o src/api/types.gen.ts
