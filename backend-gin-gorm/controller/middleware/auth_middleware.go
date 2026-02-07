@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -16,7 +14,7 @@ import (
 )
 
 type AuthUsecase interface {
-	GetUserInfo(ctx context.Context, input *domain.GetUserInfoInput) (*domain.GetUserInfoOutput, error)
+	GetUserInfo(input *domain.GetUserInfoInput) (*domain.GetUserInfoOutput, error)
 }
 
 func NewAuthMiddleware(authUsecase AuthUsecase) gin.HandlerFunc {
@@ -39,14 +37,14 @@ func NewAuthMiddleware(authUsecase AuthUsecase) gin.HandlerFunc {
 		bearerToken := authorization[len("Bearer "):]
 		input, err := domain.NewGetUserInfoInput(bearerToken)
 		if err != nil {
-			logger.WarnContext(ctx, fmt.Sprintf("new get user info input: %v", err))
+			logger.WarnContext(ctx, "new get user info input", slog.String("error", err.Error()))
 			c.Status(http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
-		output, err := authUsecase.GetUserInfo(ctx, input)
+		output, err := authUsecase.GetUserInfo(input)
 		if err != nil {
-			logger.WarnContext(ctx, fmt.Sprintf("getUserInfo: %v", err))
+			logger.WarnContext(ctx, "get user info", slog.String("error", err.Error()))
 			c.Status(http.StatusUnauthorized)
 			c.Abort()
 			return
@@ -56,7 +54,7 @@ func NewAuthMiddleware(authUsecase AuthUsecase) gin.HandlerFunc {
 		if newCtx, err := telemetry.AddBaggageMembers(ctx, map[string]string{
 			"user_id": strconv.Itoa(output.UserInfo.UserID),
 		}); err != nil {
-			logger.WarnContext(ctx, fmt.Sprintf("add baggage members: %v", err))
+			logger.WarnContext(ctx, "add baggage members", slog.String("error", err.Error()))
 		} else {
 			ctx = newCtx
 		}

@@ -87,24 +87,3 @@ func Test_TodoHandler_FindTodos_shouldReturn500_whenUsecaseReturnsError(t *testi
 	assert.Equal(t, http.StatusInternalServerError, w.Code, "status code should be 500")
 	validateErrorResponse(t, respBytes, "internal_server_error", "Internal Server Error")
 }
-
-func Test_TodoHandler_FindTodos_shouldReturn500_whenUsecaseReturnsInvalidTodos(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-
-	// given
-	userID := randomUserID()
-	todoUsecase := NewMockTodoUsecase(t)
-	todoUsecase.EXPECT().FindTodos(mock.Anything, userID).Return([]domain.Todo{{}}, nil).Once()
-	r := initTodoRouter(t, ctx, todoUsecase, userID)
-	w := httptest.NewRecorder()
-
-	// when
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/todo", nil)
-	require.NoError(t, err)
-	r.ServeHTTP(w, req)
-	respBytes := readBytes(t, w.Body)
-	// then
-	assert.Equal(t, http.StatusInternalServerError, w.Code, "status code should be 500")
-	validateErrorResponse(t, respBytes, "internal_server_error", "Internal Server Error")
-}

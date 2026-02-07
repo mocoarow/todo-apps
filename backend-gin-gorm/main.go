@@ -8,12 +8,16 @@ import (
 	"os"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/config"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/handler"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/middleware"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/gateway"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/process"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/usecase"
 )
 
 func main() {
@@ -28,31 +32,32 @@ func run() (int, error) {
 	ctx := context.Background()
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		return 1, fmt.Errorf("LoadConfig: %w", err)
+		return 1, fmt.Errorf("load config: %w", err)
 	}
 	logger := slog.Default().With(slog.String(domain.LoggerNameKey, domain.AppName+"-main"))
 
-	// dbc, shutdownDB, err := gateway.InitDB(ctx, cfg.DB, cfg.Log, domain.AppName)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer shutdownDB()
+	dbc, shutdownDB, err := gateway.InitDB(ctx, cfg.DB, cfg.Log, domain.AppName)
+	if err != nil {
+		return 1, fmt.Errorf("init db: %w", err)
+	}
+	defer shutdownDB()
 	router := handler.InitRootRouterGroup(ctx, cfg.Server.Gin, domain.AppName)
 
-	// authUsecase := usecase.NewAuthUsecase()
+	authTokenManager := gateway.NewAuthTokenManager([]byte(cfg.Auth.SigningKey), jwt.SigningMethodHS256, time.Duration(cfg.Auth.AccessTokenTTLMin)*time.Minute)
+	authUsecase := usecase.NewAuthUsecase(authTokenManager)
 
 	// api
-	// api := router.Group("api")
+	api := router.Group("api")
 
 	// v1
-	// v1 := api.Group("v1")
+	v1 := api.Group("v1")
 
-	// authMiddleware := middleware.NewAuthMiddleware(authUsecase)
-	// todoRepo := gateway.NewTodoRepository(dbc.DB)
-	// todoCreateBulkCommandTxManager := gateway.NewTodoCreateBulkCommandTxManager(dbc)
-	// todoUsecase := usecase.NewTodoUsecase(todoRepo, todoCreateBulkCommandTxManager)
-	// funcs := handler.NewInitTodoRouterFunc(todoUsecase)
-	// funcs(v1, authMiddleware)
+	authMiddleware := middleware.NewAuthMiddleware(authUsecase)
+	todoRepo := gateway.NewTodoRepository(dbc.DB)
+	todoCreateBulkCommandTxManager := gateway.NewTodoCreateBulkCommandTxManager(dbc)
+	todoUsecase := usecase.NewTodoUsecase(todoRepo, todoCreateBulkCommandTxManager)
+	funcs := handler.NewInitTodoRouterFunc(todoUsecase)
+	funcs(v1, authMiddleware)
 
 	// run
 	readHeaderTimeout := time.Duration(cfg.Server.ReadHeaderTimeoutSec) * time.Second
