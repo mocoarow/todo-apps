@@ -53,11 +53,17 @@ func run() (int, error) {
 	v1 := api.Group("v1")
 
 	authMiddleware := middleware.NewAuthMiddleware(authUsecase)
-	todoRepo := gateway.NewTodoRepository(dbc.DB)
-	todoCreateBulkCommandTxManager := gateway.NewTodoCreateBulkCommandTxManager(dbc)
-	todoUsecase := usecase.NewTodoUsecase(todoRepo, todoCreateBulkCommandTxManager)
-	funcs := handler.NewInitTodoRouterFunc(todoUsecase)
-	funcs(v1, authMiddleware)
+	{
+		todoRepo := gateway.NewTodoRepository(dbc.DB)
+		todoCreateBulkCommandTxManager := gateway.NewTodoCreateBulkCommandTxManager(dbc)
+		todoUsecase := usecase.NewTodoUsecase(todoRepo, todoCreateBulkCommandTxManager)
+		funcs := handler.NewInitTodoRouterFunc(todoUsecase)
+		funcs(v1, authMiddleware)
+	}
+	{
+		funcs := handler.NewInitAuthRouterFunc(authUsecase)
+		funcs(v1)
+	}
 
 	// run
 	readHeaderTimeout := time.Duration(cfg.Server.ReadHeaderTimeoutSec) * time.Second

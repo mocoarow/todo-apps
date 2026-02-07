@@ -112,10 +112,10 @@ func InitLogProvider(ctx context.Context, logConfig *LogConfig, appName string) 
 		defer cancel()
 
 		if err := lp.Shutdown(shutdownCtx); err != nil {
-			slog.Error("failed to shutdown log provider", slog.String("error", err.Error()))
+			slog.Error("failed to shutdown log provider", slog.Any("error", err))
 		}
 		if err := bp.Shutdown(shutdownCtx); err != nil {
-			slog.Error("failed to shutdown log batch processor", slog.String("error", err.Error()))
+			slog.Error("failed to shutdown log batch processor", slog.Any("error", err))
 		}
 	}, nil
 }

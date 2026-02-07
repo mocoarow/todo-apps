@@ -17,7 +17,7 @@ var db *gorm.DB
 func TestMain(m *testing.M) {
 	tmpdb, err := OpenTestMySQL()
 	if err != nil {
-		slog.Error("failed to open test MySQL", slog.String("error", err.Error()))
+		slog.Error("failed to open test MySQL", slog.Any("error", err))
 		os.Exit(1)
 	}
 

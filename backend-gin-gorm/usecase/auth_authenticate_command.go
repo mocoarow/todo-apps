@@ -29,7 +29,7 @@ func NewAuthenticateCommand(authTokenCreator AuthTokenCreator) *AuthenticateComm
 func (c *AuthenticateCommand) Execute(input *domain.AuthenticateInput) (*domain.AuthenticateOutput, error) {
 	userID, err := c.authenticate(input.LoginID, input.Password)
 	if err != nil {
-		return nil, fmt.Errorf("authenticate user: %w", err)
+		return nil, fmt.Errorf("authenticate user: %w: %w", domain.ErrUnauthenticated, err)
 	}
 
 	accessToken, err := c.authTokenCreator.CreateToken(input.LoginID, userID)

@@ -1,0 +1,189 @@
+---
+desc: アクセストークンを発行し Todo の CRUD 操作を行う
+runners:
+  req: http://localhost:8080
+vars:
+  LOGIN_ID: ${LOGIN_ID}
+  PASSWORD: ${PASSWORD}
+steps:
+  createToken:
+    desc: アクセストークンを発行する
+    req:
+      /api/v1/auth/authenticate:
+        post:
+          body:
+            application/json:
+              loginId: "{{ vars.LOGIN_ID }}"
+              password: "{{ vars.PASSWORD }}"
+    test: |
+      current.res.status == 200
+      && (current.res.body.accessToken startsWith "eyJ") == true
+    bind:
+      accessToken: current.res.body.accessToken
+
+  findTodos:
+    desc: Todo一覧を取得
+    req:
+      /api/v1/todo:
+        get:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+    test: |
+      current.res.status == 200
+      && len(current.res.body.todos) == 0
+
+  createTodo:
+    desc: Todoを作成
+    req:
+      /api/v1/todo:
+        post:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+          body:
+            application/json:
+              text: "New Todo Item"
+    test: |
+      current.res.status == 201
+      && current.res.body.id > 0
+    bind:
+      todoId: current.res.body.id
+
+  findTodosAfterCreate:
+    desc: Todo一覧を取得(作成後)
+    req:
+      /api/v1/todo:
+        get:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+    test: |
+      current.res.status == 200
+      && len(current.res.body.todos) == 1
+      && current.res.body.todos[0].text == "New Todo Item"
+      && current.res.body.todos[0].isComplete == false
+
+  updateTodoIncomplete:
+    desc: Todoを更新(未完了)
+    req:
+      /api/v1/todo/{{ todoId }}:
+        put:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+          body:
+            application/json:
+              text: "Updated Todo Item"
+              isComplete: false
+    test: |
+      current.res.status == 200
+      && current.res.body.text == "Updated Todo Item"
+      && current.res.body.isComplete == false
+
+  updateTodoComplete:
+    desc: Todoを更新(完了)
+    req:
+      /api/v1/todo/{{ todoId }}:
+        put:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+          body:
+            application/json:
+              text: "Updated Todo Item"
+              isComplete: true
+    test: |
+      current.res.status == 200
+      && current.res.body.text == "Updated Todo Item"
+      && current.res.body.isComplete == true
+
+  findTodosAfterUpdate:
+    desc: Todo一覧を取得(更新後)
+    req:
+      /api/v1/todo:
+        get:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+    test: |
+      current.res.status == 200
+      && len(current.res.body.todos) == 1
+      && current.res.body.todos[0].text == "Updated Todo Item"
+      && current.res.body.todos[0].isComplete == true
+
+  bulkCreateTodo:
+    desc: Todoを一括作成(成功)
+    req:
+      /api/v1/todo/bulk:
+        post:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+          body:
+            application/json:
+              todos: [
+                {text: "New Todo Item 1"},
+                {text: "New Todo Item 2"}
+              ]
+    test: |
+      current.res.status == 201
+      && len(current.res.body.todos) == 2
+      && current.res.body.todos[0].id > 0
+      && current.res.body.todos[1].id > 0
+
+  deleteTodo:
+    desc: Todoを削除
+    req:
+      /api/v1/todo/{{ todoId }}:
+        delete:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+    test: |
+      current.res.status == 204
+
+  findTodosAfterDelete:
+    desc: Todo一覧を取得(削除後)
+    req:
+      /api/v1/todo:
+        get:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+    test: |
+      current.res.status == 200
+      && len(current.res.body.todos) == 2
+
+  createTodoErrorCase:
+    desc: Todoを作成(エラーケース)
+    req:
+      /api/v1/todo:
+        post:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+          body:
+            application/json:
+              text: "XYZ"
+    test: |
+      current.res.status == 500
+      && current.res.body.code == "internal_server_error"
+
+  bulkCreateTodoErrorCase:
+    desc: Todoを一括作成(失敗)
+    req:
+      /api/v1/todo/bulk:
+        post:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+          body:
+            application/json:
+              todos: [
+                {text: "New Todo Item 3"},
+                {text: "XYZ"}
+              ]
+    test: |
+      current.res.status == 500
+      && current.res.body.code == "internal_server_error"
+
+  findTodosAfterBulkCreateError:
+    desc: Todo一覧を取得(一括作成失敗後)
+    req:
+      /api/v1/todo:
+        get:
+          headers:
+            authorization: "Bearer {{ accessToken }}"
+    test: |
+      current.res.status == 200
+      && len(current.res.body.todos) == 2
