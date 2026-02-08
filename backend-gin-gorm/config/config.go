@@ -22,11 +22,18 @@ type ServerConfig struct {
 	Shutdown             *controller.ShutdownConfig `yaml:"shutdown" validate:"required"`
 }
 
+// AuthConfig holds JWT signing key, token TTL, and cookie delivery settings.
+type AuthConfig struct {
+	SigningKey        string                   `yaml:"signingKey" validate:"required,min=32"`
+	AccessTokenTTLMin int                      `yaml:"accessTokenTtlMin" validate:"gte=1"`
+	Cookie            *controller.CookieConfig `yaml:"cookie" validate:"required"`
+}
+
 type Config struct {
-	Server *ServerConfig       `yaml:"server" validate:"required"`
-	DB     *gateway.DBConfig   `yaml:"db" validate:"required"`
-	Auth   *gateway.AuthConfig `yaml:"auth" validate:"required"`
-	Log    *gateway.LogConfig  `yaml:"log" validate:"required"`
+	Server *ServerConfig      `yaml:"server" validate:"required"`
+	DB     *gateway.DBConfig  `yaml:"db" validate:"required"`
+	Auth   *AuthConfig        `yaml:"auth" validate:"required"`
+	Log    *gateway.LogConfig `yaml:"log" validate:"required"`
 }
 
 //go:embed config.yml

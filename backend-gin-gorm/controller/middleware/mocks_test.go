@@ -97,3 +97,65 @@ func (_c *MockAuthUsecase_GetUserInfo_Call) RunAndReturn(run func(input *domain.
 	_c.Call.Return(run)
 	return _c
 }
+
+// RefreshToken provides a mock function for the type MockAuthUsecase
+func (_mock *MockAuthUsecase) RefreshToken(input *domain.RefreshTokenInput) (*domain.RefreshTokenOutput, error) {
+	ret := _mock.Called(input)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RefreshToken")
+	}
+
+	var r0 *domain.RefreshTokenOutput
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(*domain.RefreshTokenInput) (*domain.RefreshTokenOutput, error)); ok {
+		return returnFunc(input)
+	}
+	if returnFunc, ok := ret.Get(0).(func(*domain.RefreshTokenInput) *domain.RefreshTokenOutput); ok {
+		r0 = returnFunc(input)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.RefreshTokenOutput)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(*domain.RefreshTokenInput) error); ok {
+		r1 = returnFunc(input)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockAuthUsecase_RefreshToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RefreshToken'
+type MockAuthUsecase_RefreshToken_Call struct {
+	*mock.Call
+}
+
+// RefreshToken is a helper method to define mock.On call
+//   - input *domain.RefreshTokenInput
+func (_e *MockAuthUsecase_Expecter) RefreshToken(input interface{}) *MockAuthUsecase_RefreshToken_Call {
+	return &MockAuthUsecase_RefreshToken_Call{Call: _e.mock.On("RefreshToken", input)}
+}
+
+func (_c *MockAuthUsecase_RefreshToken_Call) Run(run func(input *domain.RefreshTokenInput)) *MockAuthUsecase_RefreshToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 *domain.RefreshTokenInput
+		if args[0] != nil {
+			arg0 = args[0].(*domain.RefreshTokenInput)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockAuthUsecase_RefreshToken_Call) Return(refreshTokenOutput *domain.RefreshTokenOutput, err error) *MockAuthUsecase_RefreshToken_Call {
+	_c.Call.Return(refreshTokenOutput, err)
+	return _c
+}
+
+func (_c *MockAuthUsecase_RefreshToken_Call) RunAndReturn(run func(input *domain.RefreshTokenInput) (*domain.RefreshTokenOutput, error)) *MockAuthUsecase_RefreshToken_Call {
+	_c.Call.Return(run)
+	return _c
+}

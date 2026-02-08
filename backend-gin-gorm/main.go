@@ -41,9 +41,17 @@ func run() (int, error) {
 		return 1, fmt.Errorf("init db: %w", err)
 	}
 	defer shutdownDB()
-	router := handler.InitRootRouterGroup(ctx, cfg.Server.Gin, domain.AppName)
+	router, err := handler.InitRootRouterGroup(ctx, cfg.Server.Gin, domain.AppName)
+	if err != nil {
+		return 1, fmt.Errorf("init router: %w", err)
+	}
 
-	authTokenManager := gateway.NewAuthTokenManager([]byte(cfg.Auth.SigningKey), jwt.SigningMethodHS256, time.Duration(cfg.Auth.AccessTokenTTLMin)*time.Minute)
+	authTokenManager := gateway.NewAuthTokenManager(
+		[]byte(cfg.Auth.SigningKey),
+		jwt.SigningMethodHS256,
+		time.Duration(cfg.Auth.AccessTokenTTLMin)*time.Minute,
+		time.Duration(cfg.Auth.Cookie.RefreshThresholdMin)*time.Minute,
+	)
 	authUsecase := usecase.NewAuthUsecase(authTokenManager)
 
 	// api
@@ -52,7 +60,7 @@ func run() (int, error) {
 	// v1
 	v1 := api.Group("v1")
 
-	authMiddleware := middleware.NewAuthMiddleware(authUsecase)
+	authMiddleware := middleware.NewAuthMiddleware(authUsecase, cfg.Auth.Cookie, cfg.Auth.AccessTokenTTLMin)
 	{
 		todoRepo := gateway.NewTodoRepository(dbc.DB)
 		todoCreateBulkCommandTxManager := gateway.NewTodoCreateBulkCommandTxManager(dbc)
@@ -61,7 +69,7 @@ func run() (int, error) {
 		funcs(v1, authMiddleware)
 	}
 	{
-		funcs := handler.NewInitAuthRouterFunc(authUsecase)
+		funcs := handler.NewInitAuthRouterFunc(authUsecase, cfg.Auth.Cookie, cfg.Auth.AccessTokenTTLMin)
 		funcs(v1)
 	}
 

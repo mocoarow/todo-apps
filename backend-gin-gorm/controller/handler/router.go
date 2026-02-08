@@ -4,6 +4,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -37,12 +38,15 @@ type Config struct {
 }
 
 // InitRootRouterGroup creates a Gin engine with recovery, CORS, metrics, tracing, and optional access logging.
-func InitRootRouterGroup(_ context.Context, config *Config, appName string) *gin.Engine {
+func InitRootRouterGroup(_ context.Context, config *Config, appName string) (*gin.Engine, error) {
 	if !config.Debug.Gin {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	corsConfig := InitCORS(config.CORS)
+	corsConfig, err := InitCORS(config.CORS)
+	if err != nil {
+		return nil, fmt.Errorf("init CORS: %w", err)
+	}
 
 	router := gin.New()
 	router.Use(gin.Recovery())
@@ -80,5 +84,5 @@ func InitRootRouterGroup(_ context.Context, config *Config, appName string) *gin
 		router.Use(middleware.NewWaitMiddleware(time.Second))
 	}
 
-	return router
+	return router, nil
 }

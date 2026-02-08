@@ -3,6 +3,7 @@ package usecase_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,7 +17,7 @@ func Test_AuthGetUserInfoQuery_Execute_shouldReturnUserInfo_whenValidToken(t *te
 
 	// given
 	mockParser := NewMockAuthTokenParser(t)
-	userInfo, err := domain.NewUserInfo(1, "user1")
+	userInfo, err := domain.NewUserInfo(1, "user1", time.Now().Add(60*time.Minute))
 	require.NoError(t, err)
 	mockParser.EXPECT().ParseToken("valid-token").Return(userInfo, nil).Once()
 	query := usecase.NewAuthGetUserInfoQuery(mockParser)

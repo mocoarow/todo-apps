@@ -9,12 +9,6 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
-// AuthConfig holds JWT signing key and token TTL settings.
-type AuthConfig struct {
-	SigningKey        string `yaml:"signingKey" validate:"required,min=32"`
-	AccessTokenTTLMin int    `yaml:"accessTokenTtlMin" validate:"gte=1"`
-}
-
 type userClaims struct {
 	LoginID string `json:"loginId"`
 	UserID  int    `json:"userId"`
@@ -23,17 +17,19 @@ type userClaims struct {
 
 // AuthTokenManager implements JWT token creation and parsing using HMAC signing.
 type AuthTokenManager struct {
-	signingKey    []byte
-	signingMethod jwt.SigningMethod
-	tokenTimeout  time.Duration
+	signingKey       []byte
+	signingMethod    jwt.SigningMethod
+	tokenTimeout     time.Duration
+	refreshThreshold time.Duration
 }
 
 // NewAuthTokenManager returns a new AuthTokenManager with the given signing parameters.
-func NewAuthTokenManager(signingKey []byte, signingMethod jwt.SigningMethod, tokenTimeout time.Duration) *AuthTokenManager {
+func NewAuthTokenManager(signingKey []byte, signingMethod jwt.SigningMethod, tokenTimeout time.Duration, refreshThreshold time.Duration) *AuthTokenManager {
 	return &AuthTokenManager{
-		signingKey:    signingKey,
-		signingMethod: signingMethod,
-		tokenTimeout:  tokenTimeout,
+		signingKey:       signingKey,
+		signingMethod:    signingMethod,
+		tokenTimeout:     tokenTimeout,
+		refreshThreshold: refreshThreshold,
 	}
 }
 
@@ -47,19 +43,35 @@ func (m *AuthTokenManager) CreateToken(loginID string, userID int) (string, erro
 	return accessToken, nil
 }
 
-// ParseToken validates a JWT string and returns the embedded user info.
+// ParseToken validates a JWT string and returns the embedded user info including token expiry.
 func (m *AuthTokenManager) ParseToken(tokenString string) (*domain.UserInfo, error) {
 	claims, err := m.parseToken(tokenString)
 	if err != nil {
 		return nil, fmt.Errorf("parse token: %w", err)
 	}
 
-	userInfo, err := domain.NewUserInfo(claims.UserID, claims.LoginID)
+	userInfo, err := domain.NewUserInfo(claims.UserID, claims.LoginID, claims.ExpiresAt.Time)
 	if err != nil {
 		return nil, fmt.Errorf("create user info: %w", err)
 	}
 
 	return userInfo, nil
+}
+
+// RefreshToken checks if the token's remaining lifetime is below the refresh threshold.
+// If so, it issues a new token with a fresh expiry. Returns empty string if no refresh is needed.
+func (m *AuthTokenManager) RefreshToken(loginID string, userID int, expiresAt time.Time) (string, error) {
+	remaining := time.Until(expiresAt)
+	if remaining > m.refreshThreshold {
+		return "", nil
+	}
+
+	newToken, err := m.createJWT(loginID, userID, m.tokenTimeout)
+	if err != nil {
+		return "", fmt.Errorf("create refreshed token: %w", err)
+	}
+
+	return newToken, nil
 }
 
 func (m *AuthTokenManager) createJWT(loginID string, userID int, duration time.Duration) (string, error) {
