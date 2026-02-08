@@ -26,7 +26,7 @@ func InitCORS(cfg *CORSConfig) (cors.Config, error) {
 
 	if len(allowOrigins) == 1 && allowOrigins[0] == "*" {
 		if cfg.AllowCredentials {
-			return cors.Config{}, ErrCORSCredentialsWithWildcard //nolint:exhaustruct
+			return cors.Config{}, ErrCORSCredentialsWithWildcard
 		}
 
 		return cors.Config{ //nolint:exhaustruct
