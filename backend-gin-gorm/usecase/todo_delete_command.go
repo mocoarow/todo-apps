@@ -7,13 +7,18 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// TodoDeleter defines the interface for deleting todos from the repository.
+type TodoDeleter interface {
+	DeleteTodo(ctx context.Context, input *domain.DeleteTodoInput) error
+}
+
 // DeleteTodoCommand removes a todo item from the repository.
 type DeleteTodoCommand struct {
-	repo domain.TodoRepository
+	repo TodoDeleter
 }
 
 // NewDeleteTodoCommand returns a new DeleteTodoCommand.
-func NewDeleteTodoCommand(repo domain.TodoRepository) *DeleteTodoCommand {
+func NewDeleteTodoCommand(repo TodoDeleter) *DeleteTodoCommand {
 	return &DeleteTodoCommand{
 		repo: repo,
 	}

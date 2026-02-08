@@ -9,7 +9,7 @@ import (
 
 // TodoCreateBulkCommandTxManager manages database transactions for bulk todo creation.
 type TodoCreateBulkCommandTxManager interface {
-	WithTransaction(ctx context.Context, fn func(todoRepo domain.TodoRepository) ([]domain.Todo, error)) ([]domain.Todo, error)
+	WithTransaction(ctx context.Context, fn func(createTodo domain.CreateTodoFunc) ([]domain.Todo, error)) ([]domain.Todo, error)
 }
 
 // CreateBulkTodosCommand creates multiple todos within a single transaction.
@@ -26,10 +26,10 @@ func NewCreateBulkTodosCommand(txManager TodoCreateBulkCommandTxManager) *Create
 
 // Execute creates all todos from input in a single transaction. It rolls back on any failure.
 func (u *CreateBulkTodosCommand) Execute(ctx context.Context, input *domain.CreateBulkTodosInput) (*domain.CreateBulkTodosOutput, error) {
-	todos, err := u.txManager.WithTransaction(ctx, func(todoRepo domain.TodoRepository) ([]domain.Todo, error) {
+	todos, err := u.txManager.WithTransaction(ctx, func(createTodo domain.CreateTodoFunc) ([]domain.Todo, error) {
 		var todos []domain.Todo
 		for _, todoInput := range input.Todos {
-			todo, err := todoRepo.CreateTodo(ctx, &todoInput)
+			todo, err := createTodo(ctx, &todoInput)
 			if err != nil {
 				return nil, fmt.Errorf("create todo: %w", err)
 			}

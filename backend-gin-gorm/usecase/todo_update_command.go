@@ -7,13 +7,18 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// TodoUpdater defines the interface for updating todos in the repository.
+type TodoUpdater interface {
+	UpdateTodo(ctx context.Context, input *domain.UpdateTodoInput) (*domain.Todo, error)
+}
+
 // UpdateTodoCommand updates an existing todo item in the repository.
 type UpdateTodoCommand struct {
-	repo domain.TodoRepository
+	repo TodoUpdater
 }
 
 // NewUpdateTodoCommand returns a new UpdateTodoCommand.
-func NewUpdateTodoCommand(repo domain.TodoRepository) *UpdateTodoCommand {
+func NewUpdateTodoCommand(repo TodoUpdater) *UpdateTodoCommand {
 	return &UpdateTodoCommand{
 		repo: repo,
 	}

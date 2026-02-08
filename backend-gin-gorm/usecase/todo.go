@@ -8,6 +8,14 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// TodoRepository composes all todo CRUD interfaces.
+type TodoRepository interface {
+	TodoCreator
+	TodoFinder
+	TodoUpdater
+	TodoDeleter
+}
+
 // TodoUsecase orchestrates todo CRUD operations via command/query objects.
 type TodoUsecase struct {
 	findTodosQuery         *FindTodosQuery
@@ -19,7 +27,7 @@ type TodoUsecase struct {
 }
 
 // NewTodoUsecase returns a new TodoUsecase wired with the given repository and transaction manager.
-func NewTodoUsecase(repo domain.TodoRepository, createBulkCommandTxManager TodoCreateBulkCommandTxManager) *TodoUsecase {
+func NewTodoUsecase(repo TodoRepository, createBulkCommandTxManager TodoCreateBulkCommandTxManager) *TodoUsecase {
 	findTodosQuery := NewFindTodosQuery(repo)
 	createTodoCommand := NewCreateTodoCommand(repo)
 	createBulkTodosCommand := NewCreateBulkTodosCommand(createBulkCommandTxManager)
@@ -77,8 +85,7 @@ func (u *TodoUsecase) UpdateTodo(ctx context.Context, input *domain.UpdateTodoIn
 
 // DeleteTodo removes a todo item.
 func (u *TodoUsecase) DeleteTodo(ctx context.Context, input *domain.DeleteTodoInput) error {
-	err := u.deleteTodoCommand.Execute(ctx, input)
-	if err != nil {
+	if err := u.deleteTodoCommand.Execute(ctx, input); err != nil {
 		return fmt.Errorf("execute delete todo command: %w", err)
 	}
 	return nil

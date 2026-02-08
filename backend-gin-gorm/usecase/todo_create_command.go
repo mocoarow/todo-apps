@@ -7,13 +7,18 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// TodoCreator defines the interface for creating todos in the repository.
+type TodoCreator interface {
+	CreateTodo(ctx context.Context, input *domain.CreateTodoInput) (*domain.Todo, error)
+}
+
 // CreateTodoCommand persists a new todo item via the repository.
 type CreateTodoCommand struct {
-	repo domain.TodoRepository
+	repo TodoCreator
 }
 
 // NewCreateTodoCommand returns a new CreateTodoCommand.
-func NewCreateTodoCommand(repo domain.TodoRepository) *CreateTodoCommand {
+func NewCreateTodoCommand(repo TodoCreator) *CreateTodoCommand {
 	return &CreateTodoCommand{
 		repo: repo,
 	}

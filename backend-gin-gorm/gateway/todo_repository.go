@@ -50,7 +50,7 @@ func (e TodoEntities) toTodos() ([]domain.Todo, error) {
 	return todos, nil
 }
 
-// TodoRepository implements domain.TodoRepository using GORM.
+// TodoRepository implements todo persistence operations using GORM.
 type TodoRepository struct {
 	db *gorm.DB
 }
@@ -157,12 +157,12 @@ func NewTodoCreateBulkCommandTxManager(dbc *DBConnection) *TodoCreateBulkCommand
 }
 
 // WithTransaction executes fn within a database transaction, rolling back on error.
-func (tm *TodoCreateBulkCommandTxManager) WithTransaction(ctx context.Context, fn func(todoRepo domain.TodoRepository) ([]domain.Todo, error)) ([]domain.Todo, error) {
+func (tm *TodoCreateBulkCommandTxManager) WithTransaction(ctx context.Context, fn func(createTodo domain.CreateTodoFunc) ([]domain.Todo, error)) ([]domain.Todo, error) {
 	var todos []domain.Todo
 	err := tm.dbc.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		todoRepo := NewTodoRepository(tx)
 		var err error
-		todos, err = fn(todoRepo)
+		todos, err = fn(todoRepo.CreateTodo)
 		if err != nil {
 			return fmt.Errorf("execute function in transaction: %w", err)
 		}
