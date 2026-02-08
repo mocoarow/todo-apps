@@ -47,7 +47,7 @@ tasks:
     desc: "Generate OpenAPI models using oapi-codegen"
     cmds:
       - mkdir -p api
-      - rm -r api/types.gen.go
+      - rm -f api/types.gen.go
       - oapi-codegen -package=api -generate=models -o=api/types.gen.go ../openapi/openapi.yaml
       - go fmt api/types.gen.go || true
       - echo "Models generated"

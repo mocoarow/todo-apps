@@ -27,6 +27,19 @@ func (c *CookieConfig) SetTokenCookie(w http.ResponseWriter, token string, token
 	})
 }
 
+// ClearTokenCookie removes the access-token cookie by setting MaxAge to -1.
+func (c *CookieConfig) ClearTokenCookie(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{ //nolint:exhaustruct
+		Name:     c.Name,
+		Value:    "",
+		Path:     c.Path,
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   c.Secure,
+		SameSite: parseSameSite(c.SameSite),
+	})
+}
+
 func parseSameSite(s string) http.SameSite {
 	switch s {
 	case "Strict":
