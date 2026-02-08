@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/require"
+
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller/handler"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
@@ -20,7 +22,8 @@ func mockAuthMiddleware(userID int) gin.HandlerFunc {
 func initTodoRouter(t *testing.T, ctx context.Context, todoUsecase handler.TodoUsecase, userID int) *gin.Engine {
 	t.Helper()
 
-	router := handler.InitRootRouterGroup(ctx, config, domain.AppName)
+	router, err := handler.InitRootRouterGroup(ctx, config, domain.AppName)
+	require.NoError(t, err)
 	api := router.Group("api")
 	v1 := api.Group("v1")
 

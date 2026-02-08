@@ -145,7 +145,7 @@ export interface components {
             message: string;
         };
         AuthenticateResponse: {
-            accessToken: string;
+            accessToken?: string;
         };
         CreateBulkTodosResponse: {
             todos: components["schemas"]["CreateTodoResponse"][];
@@ -165,7 +165,10 @@ export interface operations {
     authenticate: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Token delivery method (json or cookie) */
+                "X-Token-Delivery"?: "json" | "cookie";
+            };
             path?: never;
             cookie?: never;
         };

@@ -23,7 +23,15 @@ paths:
       operationId: authenticate
       tags:
         - auth
-      parameters: []
+      parameters:
+        - name: X-Token-Delivery
+          in: header
+          description: Token delivery method (json or cookie)
+          required: false
+          schema:
+            type: string
+            enum: [json, cookie]
+            default: json
       requestBody:
         content:
           application/json:
@@ -87,6 +95,7 @@ paths:
           headers: {}
       security:
         - BearerAuth: []
+        - CookieAuth: []
     post:
       summary: Create a new todo
       deprecated: false
@@ -133,6 +142,7 @@ paths:
           headers: {}
       security:
         - BearerAuth: []
+        - CookieAuth: []
   /api/v1/todo/bulk:
     post:
       summary: Create multiple todos
@@ -180,6 +190,7 @@ paths:
           headers: {}
       security:
         - BearerAuth: []
+        - CookieAuth: []
   /api/v1/todo/{id}:
     put:
       summary: Update a todo
@@ -241,6 +252,7 @@ paths:
           headers: {}
       security:
         - BearerAuth: []
+        - CookieAuth: []
     delete:
       summary: Delete a todo
       deprecated: false
@@ -290,6 +302,7 @@ paths:
           headers: {}
       security:
         - BearerAuth: []
+        - CookieAuth: []
 components:
   schemas:
     AuthenticateRequest:
@@ -436,12 +449,15 @@ components:
         - message
     AuthenticateResponse:
       type: object
-      required:
-        - accessToken
+      description: >-
+        Authentication response. When X-Token-Delivery is 'json' (default),
+        accessToken is returned in the body. When 'cookie', the token is
+        delivered via Set-Cookie header and accessToken is omitted.
       properties:
         accessToken:
           type: string
           pattern: ^.*$
+          description: JWT access token (omitted when delivered via cookie)
     CreateBulkTodosResponse:
       type: object
       properties:
@@ -470,5 +486,9 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
 servers: []
 security: []

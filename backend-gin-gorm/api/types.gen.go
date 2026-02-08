@@ -11,6 +11,12 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
+// Defines values for AuthenticateParamsXTokenDelivery.
+const (
+	Cookie AuthenticateParamsXTokenDelivery = "cookie"
+	Json   AuthenticateParamsXTokenDelivery = "json"
+)
+
 // AuthenticateRequest defines model for AuthenticateRequest.
 type AuthenticateRequest struct {
 	LoginID  string `binding:"required,max=100" json:"loginId"`
@@ -19,7 +25,7 @@ type AuthenticateRequest struct {
 
 // AuthenticateResponse defines model for AuthenticateResponse.
 type AuthenticateResponse struct {
-	AccessToken string `json:"accessToken"`
+	AccessToken *string `json:"accessToken,omitempty"`
 }
 
 // CreateBulkTodosRequest defines model for CreateBulkTodosRequest.
@@ -80,6 +86,15 @@ type UpdateTodoResponse struct {
 	Text       string    `json:"text"`
 	UpdatedAt  time.Time `json:"updatedAt"`
 }
+
+// AuthenticateParams defines parameters for Authenticate.
+type AuthenticateParams struct {
+	// XTokenDelivery Token delivery method (json or cookie)
+	XTokenDelivery *AuthenticateParamsXTokenDelivery `json:"X-Token-Delivery,omitempty"`
+}
+
+// AuthenticateParamsXTokenDelivery defines parameters for Authenticate.
+type AuthenticateParamsXTokenDelivery string
 
 // AuthenticateJSONRequestBody defines body for Authenticate for application/json ContentType.
 type AuthenticateJSONRequestBody = AuthenticateRequest

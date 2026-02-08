@@ -3,6 +3,7 @@ package domain
 import (
 	"errors"
 	"fmt"
+	"time"
 )
 
 // ErrUnauthenticated is returned when authentication fails due to invalid credentials.
@@ -42,17 +43,19 @@ func NewAuthenticateOutput(accessToken string) (*AuthenticateOutput, error) {
 	return m, nil
 }
 
-// UserInfo represents an authenticated user's identity.
+// UserInfo represents an authenticated user's identity extracted from a JWT token.
 type UserInfo struct {
-	UserID  int    `validate:"required,gt=0"`
-	LoginID string `validate:"required"`
+	UserID    int       `validate:"required,gt=0"`
+	LoginID   string    `validate:"required"`
+	ExpiresAt time.Time `validate:"required"`
 }
 
 // NewUserInfo creates a validated UserInfo.
-func NewUserInfo(userID int, loginID string) (*UserInfo, error) {
+func NewUserInfo(userID int, loginID string, expiresAt time.Time) (*UserInfo, error) {
 	m := &UserInfo{
-		UserID:  userID,
-		LoginID: loginID,
+		UserID:    userID,
+		LoginID:   loginID,
+		ExpiresAt: expiresAt,
 	}
 	if err := ValidateStruct(m); err != nil {
 		return nil, fmt.Errorf("validate user info: %w", err)
@@ -90,4 +93,37 @@ func NewGetUserInfoOutput(userInfo *UserInfo) (*GetUserInfoOutput, error) {
 		return nil, fmt.Errorf("validate get user info output: %w", err)
 	}
 	return m, nil
+}
+
+// RefreshTokenInput holds the parsed claims needed for a token refresh check.
+type RefreshTokenInput struct {
+	LoginID   string    `validate:"required"`
+	UserID    int       `validate:"required,gt=0"`
+	ExpiresAt time.Time `validate:"required"`
+}
+
+// NewRefreshTokenInput creates a validated RefreshTokenInput.
+func NewRefreshTokenInput(loginID string, userID int, expiresAt time.Time) (*RefreshTokenInput, error) {
+	m := &RefreshTokenInput{
+		LoginID:   loginID,
+		UserID:    userID,
+		ExpiresAt: expiresAt,
+	}
+	if err := ValidateStruct(m); err != nil {
+		return nil, fmt.Errorf("validate refresh token input: %w", err)
+	}
+	return m, nil
+}
+
+// RefreshTokenOutput holds the result of a token refresh attempt.
+// NewAccessToken is empty if no refresh was needed.
+type RefreshTokenOutput struct {
+	NewAccessToken string
+}
+
+// NewRefreshTokenOutput creates a RefreshTokenOutput.
+func NewRefreshTokenOutput(newAccessToken string) *RefreshTokenOutput {
+	return &RefreshTokenOutput{
+		NewAccessToken: newAccessToken,
+	}
 }

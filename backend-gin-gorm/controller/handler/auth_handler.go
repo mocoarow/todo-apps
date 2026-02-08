@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/api"
+	"github.com/mocoarow/todo-apps/backend-gin-gorm/controller"
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
@@ -18,15 +19,19 @@ type AuthUsecase interface {
 
 // AuthHandler handles HTTP requests for user authentication.
 type AuthHandler struct {
-	usecase AuthUsecase
-	logger  *slog.Logger
+	usecase      AuthUsecase
+	logger       *slog.Logger
+	cookieConfig *controller.CookieConfig
+	tokenTTLMin  int
 }
 
 // NewAuthHandler returns a new AuthHandler with the given use case.
-func NewAuthHandler(usecase AuthUsecase) *AuthHandler {
+func NewAuthHandler(usecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int) *AuthHandler {
 	return &AuthHandler{
-		usecase: usecase,
-		logger:  slog.Default().With(slog.String(domain.LoggerNameKey, "AuthHandler")),
+		usecase:      usecase,
+		logger:       slog.Default().With(slog.String(domain.LoggerNameKey, "AuthHandler")),
+		cookieConfig: cookieConfig,
+		tokenTTLMin:  tokenTTLMin,
 	}
 }
 
@@ -37,6 +42,15 @@ func (h *AuthHandler) Authenticate(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.logger.WarnContext(ctx, "invalid authenticate request", slog.Any("error", err))
 		c.JSON(http.StatusBadRequest, NewErrorResponse("invalid_authenticate_request", "request body is invalid"))
+		return
+	}
+
+	tokenDelivery := c.GetHeader("X-Token-Delivery")
+	switch tokenDelivery {
+	case "", "json", "cookie":
+		// valid
+	default:
+		c.JSON(http.StatusBadRequest, NewErrorResponse("invalid_token_delivery", "X-Token-Delivery must be 'json' or 'cookie'"))
 		return
 	}
 
@@ -59,17 +73,30 @@ func (h *AuthHandler) Authenticate(c *gin.Context) {
 		return
 	}
 
-	resp := api.AuthenticateResponse{
-		AccessToken: output.AccessToken,
+	switch tokenDelivery {
+	case "cookie":
+		if h.cookieConfig == nil {
+			h.logger.ErrorContext(ctx, "cookie delivery requested but cookie config is not available")
+			c.JSON(http.StatusInternalServerError, NewErrorResponse("cookie_not_configured", "cookie delivery is not configured"))
+			return
+		}
+		h.cookieConfig.SetTokenCookie(c.Writer, output.AccessToken, h.tokenTTLMin)
+		c.JSON(http.StatusOK, api.AuthenticateResponse{
+			AccessToken: nil,
+		})
+	default:
+		resp := api.AuthenticateResponse{
+			AccessToken: &output.AccessToken,
+		}
+		c.JSON(http.StatusOK, resp)
 	}
-	c.JSON(http.StatusOK, resp)
 }
 
 // NewInitAuthRouterFunc returns an InitRouterGroupFunc that registers auth routes under an "auth" group.
-func NewInitAuthRouterFunc(authUsecase AuthUsecase) InitRouterGroupFunc {
+func NewInitAuthRouterFunc(authUsecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int) InitRouterGroupFunc {
 	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) {
 		auth := parentRouterGroup.Group("auth", middleware...)
-		authHandler := NewAuthHandler(authUsecase)
+		authHandler := NewAuthHandler(authUsecase, cookieConfig, tokenTTLMin)
 
 		auth.POST("/authenticate", authHandler.Authenticate)
 	}

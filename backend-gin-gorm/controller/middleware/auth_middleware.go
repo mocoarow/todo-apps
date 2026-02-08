@@ -13,14 +13,16 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
-// AuthUsecase defines the use case for extracting user info from a JWT token.
+// AuthUsecase defines the use case for extracting user info from a JWT token and refreshing tokens.
 type AuthUsecase interface {
 	GetUserInfo(input *domain.GetUserInfoInput) (*domain.GetUserInfoOutput, error)
+	RefreshToken(input *domain.RefreshTokenInput) (*domain.RefreshTokenOutput, error)
 }
 
 // NewAuthMiddleware returns a Gin middleware that validates the Bearer token
-// from the Authorization header and sets the user ID in the Gin context.
-func NewAuthMiddleware(authUsecase AuthUsecase) gin.HandlerFunc {
+// from the Authorization header (with Cookie fallback) and sets the user ID in the Gin context.
+// When the token is provided via cookie, sliding refresh is performed automatically.
+func NewAuthMiddleware(authUsecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int) gin.HandlerFunc {
 	logger := slog.Default().With(slog.String(domain.LoggerNameKey, domain.AppName+"-AuthMiddleware"))
 
 	return func(c *gin.Context) {
@@ -29,16 +31,15 @@ func NewAuthMiddleware(authUsecase AuthUsecase) gin.HandlerFunc {
 		ctx, span := tracer.Start(ctx, "AuthMiddleware")
 		defer span.End()
 
-		authorization := c.GetHeader("Authorization")
-		if !strings.HasPrefix(authorization, "Bearer ") {
-			logger.InfoContext(ctx, "invalid header. Bearer not found")
+		token, fromCookie := extractToken(c, cookieConfig)
+		if token == "" {
+			logger.InfoContext(ctx, "no token found in Authorization header or cookie")
 			c.Status(http.StatusUnauthorized)
 			c.Abort()
 			return
 		}
 
-		bearerToken := authorization[len("Bearer "):]
-		input, err := domain.NewGetUserInfoInput(bearerToken)
+		input, err := domain.NewGetUserInfoInput(token)
 		if err != nil {
 			logger.WarnContext(ctx, "new get user info input", slog.Any("error", err))
 			c.Status(http.StatusUnauthorized)
@@ -64,6 +65,47 @@ func NewAuthMiddleware(authUsecase AuthUsecase) gin.HandlerFunc {
 
 		c.Request = c.Request.WithContext(ctx)
 
+		if fromCookie && cookieConfig != nil {
+			slidingRefresh(c, authUsecase, cookieConfig, tokenTTLMin, output.UserInfo, logger)
+		}
+
 		c.Next()
 	}
+}
+
+func extractToken(c *gin.Context, cookieConfig *controller.CookieConfig) (string, bool) {
+	authorization := c.GetHeader("Authorization")
+	if strings.HasPrefix(authorization, "Bearer ") {
+		return authorization[len("Bearer "):], false
+	}
+
+	if cookieConfig != nil {
+		cookie, err := c.Cookie(cookieConfig.Name)
+		if err == nil && cookie != "" {
+			return cookie, true
+		}
+	}
+
+	return "", false
+}
+
+func slidingRefresh(c *gin.Context, authUsecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int, userInfo *domain.UserInfo, logger *slog.Logger) {
+	ctx := c.Request.Context()
+	refreshInput, err := domain.NewRefreshTokenInput(userInfo.LoginID, userInfo.UserID, userInfo.ExpiresAt)
+	if err != nil {
+		logger.WarnContext(ctx, "new refresh token input", slog.Any("error", err))
+		return
+	}
+
+	refreshOutput, err := authUsecase.RefreshToken(refreshInput)
+	if err != nil {
+		logger.WarnContext(ctx, "refresh token", slog.Any("error", err))
+		return
+	}
+
+	if refreshOutput.NewAccessToken == "" {
+		return
+	}
+
+	cookieConfig.SetTokenCookie(c.Writer, refreshOutput.NewAccessToken, tokenTTLMin)
 }
