@@ -92,6 +92,18 @@ func (h *AuthHandler) Authenticate(c *gin.Context) {
 	}
 }
 
+// Logout handles POST /auth/logout and clears the access-token cookie.
+func (h *AuthHandler) Logout(c *gin.Context) {
+	ctx := c.Request.Context()
+	if h.cookieConfig == nil {
+		h.logger.ErrorContext(ctx, "logout requested but cookie config is not available")
+		c.JSON(http.StatusInternalServerError, NewErrorResponse("cookie_not_configured", "cookie delivery is not configured"))
+		return
+	}
+	h.cookieConfig.ClearTokenCookie(c.Writer)
+	c.Status(http.StatusNoContent)
+}
+
 // NewInitAuthRouterFunc returns an InitRouterGroupFunc that registers auth routes under an "auth" group.
 func NewInitAuthRouterFunc(authUsecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int) InitRouterGroupFunc {
 	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) {
@@ -99,5 +111,6 @@ func NewInitAuthRouterFunc(authUsecase AuthUsecase, cookieConfig *controller.Coo
 		authHandler := NewAuthHandler(authUsecase, cookieConfig, tokenTTLMin)
 
 		auth.POST("/authenticate", authHandler.Authenticate)
+		auth.POST("/logout", authHandler.Logout)
 	}
 }

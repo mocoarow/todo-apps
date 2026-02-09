@@ -246,6 +246,64 @@ func Test_AuthHandler_Authenticate_shouldReturnTokenInBody_whenXTokenDeliveryIsJ
 	assert.Equal(t, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test.sig", accessToken[0])
 }
 
+func Test_AuthHandler_Logout_shouldReturn204_andClearCookie(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	authUsecase := NewMockAuthUsecase(t)
+	r := initAuthRouter(t, ctx, authUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/api/v1/auth/logout", nil)
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+
+	// then
+	assert.Equal(t, http.StatusNoContent, w.Code)
+
+	cookies := w.Result().Cookies()
+	var accessTokenCookie *http.Cookie
+	for _, c := range cookies {
+		if c.Name == "access_token" {
+			accessTokenCookie = c
+			break
+		}
+	}
+	require.NotNil(t, accessTokenCookie, "access_token cookie should be set")
+	assert.Empty(t, accessTokenCookie.Value)
+	assert.Equal(t, -1, accessTokenCookie.MaxAge)
+	assert.True(t, accessTokenCookie.HttpOnly)
+	assert.Equal(t, "/", accessTokenCookie.Path)
+}
+
+func Test_AuthHandler_Logout_shouldReturn500_whenCookieConfigIsNil(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	authUsecase := NewMockAuthUsecase(t)
+
+	router, err := handler.InitRootRouterGroup(ctx, config, domain.AppName)
+	require.NoError(t, err)
+	v1 := router.Group("api").Group("v1")
+	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, nil, 60)
+	initAuthRouterFunc(v1)
+
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/api/v1/auth/logout", nil)
+	require.NoError(t, err)
+	router.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	validateErrorResponse(t, respBytes, "cookie_not_configured", "cookie delivery is not configured")
+}
+
 func Test_AuthHandler_Authenticate_shouldReturn500_whenCookieConfigIsNilAndXTokenDeliveryIsCookie(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()

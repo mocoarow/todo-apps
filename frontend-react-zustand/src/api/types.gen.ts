@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * User logout
+         * @description Clear the access-token cookie to log the user out
+         */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/todo": {
         parameters: {
             query?: never;
@@ -144,7 +164,9 @@ export interface components {
             code: string;
             message: string;
         };
+        /** @description Authentication response. When X-Token-Delivery is 'json' (default), accessToken is returned in the body. When 'cookie', the token is delivered via Set-Cookie header and accessToken is omitted. */
         AuthenticateResponse: {
+            /** @description JWT access token (omitted when delivered via cookie) */
             accessToken?: string;
         };
         CreateBulkTodosResponse: {
@@ -195,6 +217,33 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successfully logged out */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Internal server error */
             500: {

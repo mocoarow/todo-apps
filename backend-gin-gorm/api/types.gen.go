@@ -9,6 +9,7 @@ import (
 
 const (
 	BearerAuthScopes = "BearerAuth.Scopes"
+	CookieAuthScopes = "CookieAuth.Scopes"
 )
 
 // Defines values for AuthenticateParamsXTokenDelivery.
@@ -23,8 +24,9 @@ type AuthenticateRequest struct {
 	Password string `binding:"required,min=8,max=20" json:"password"`
 }
 
-// AuthenticateResponse defines model for AuthenticateResponse.
+// AuthenticateResponse Authentication response. When X-Token-Delivery is 'json' (default), accessToken is returned in the body. When 'cookie', the token is delivered via Set-Cookie header and accessToken is omitted.
 type AuthenticateResponse struct {
+	// AccessToken JWT access token (omitted when delivered via cookie)
 	AccessToken *string `json:"accessToken,omitempty"`
 }
 
