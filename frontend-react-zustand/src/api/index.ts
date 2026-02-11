@@ -1,19 +1,26 @@
-export type {
-  components,
-  operations,
-  paths,
+import type { z } from "zod";
+import {
+  type AuthenticateBody,
+  AuthenticateResponse as AuthenticateResponseSchema,
+  type CreateBulkTodosBody,
+  type CreateTodoBody,
+  type GetTodosResponse as FindTodoResponseSchema,
+  type UpdateTodoBody,
+  type UpdateTodoResponse as UpdateTodoResponseSchema,
 } from "./types.gen";
 
-type Schemas = components["schemas"];
+// Zod schemas for runtime validation
+export { AuthenticateResponseSchema };
 
-export type AuthenticateRequest = Schemas["AuthenticateRequest"];
-export type AuthenticateResponse = Schemas["AuthenticateResponse"];
-export type CreateTodoRequest = Schemas["CreateTodoRequest"];
-export type CreateTodoResponse = Schemas["CreateTodoResponse"];
-export type CreateBulkTodosRequest = Schemas["CreateBulkTodosRequest"];
-export type CreateBulkTodosResponse = Schemas["CreateBulkTodosResponse"];
-export type UpdateTodoRequest = Schemas["UpdateTodoRequest"];
-export type UpdateTodoResponse = Schemas["UpdateTodoResponse"];
-export type FindTodoResponse = Schemas["FindTodoResponse"];
-export type FindTodoResponseTodo = Schemas["FindTodoResponseTodo"];
-export type ErrorResponse = Schemas["ErrorResponse"];
+// TypeScript types derived from Zod schemas
+export type AuthenticateRequest = z.infer<typeof AuthenticateBody>;
+export type AuthenticateResponse = z.infer<typeof AuthenticateResponseSchema>;
+export type CreateTodoRequest = z.infer<typeof CreateTodoBody>;
+export type CreateBulkTodosRequest = z.infer<typeof CreateBulkTodosBody>;
+export type UpdateTodoRequest = z.infer<typeof UpdateTodoBody>;
+export type UpdateTodoResponse = z.infer<typeof UpdateTodoResponseSchema>;
+export type FindTodoResponse = z.infer<typeof FindTodoResponseSchema>;
+export type FindTodoResponseTodo = FindTodoResponse["todos"][number];
+export type CreateTodoResponse = UpdateTodoResponse;
+export type CreateBulkTodosResponse = { todos: CreateTodoResponse[] };
+export type ErrorResponse = { code: string; message: string };
