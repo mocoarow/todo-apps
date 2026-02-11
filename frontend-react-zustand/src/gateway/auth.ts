@@ -20,7 +20,10 @@ export class HttpAuthService implements AuthService {
   async login(data: AuthenticateRequest): Promise<AuthenticateResponse> {
     const response = await this.fetchApi("/auth/authenticate", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-token-delivery": "cookie",
+      },
       body: JSON.stringify(data),
     });
     return this.parseJson(response, AuthenticateResponseSchema);

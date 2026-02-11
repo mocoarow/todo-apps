@@ -43,7 +43,10 @@ describe("HttpAuthService", () => {
       expect(result).toEqual({ accessToken: "token-123" });
       expect(fetch).toHaveBeenCalledWith(`${BASE_URL}/auth/authenticate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-token-delivery": "cookie",
+        },
         credentials: "include",
         body: JSON.stringify({ loginId: "user1", password: "password1234" }),
       });
