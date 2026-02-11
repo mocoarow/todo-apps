@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { LoginPage } from "~/pages/LoginPage";
-import { TopPage } from "~/pages/TopPage";
+import { TodoPage } from "~/pages/TodoPage";
 import { useAuthStore } from "~/stores/auth";
 
 export default function App() {
@@ -18,5 +18,5 @@ export default function App() {
     );
   }
 
-  return user ? <TopPage /> : <LoginPage />;
+  return user ? <TodoPage /> : <LoginPage />;
 }
