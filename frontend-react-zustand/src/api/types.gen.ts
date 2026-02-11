@@ -42,6 +42,16 @@ export const AuthenticateResponse = zod.object({
 
 
 /**
+ * Get the authenticated user's information
+ * @summary Get current user
+ */
+export const GetMeResponse = zod.object({
+  "userId": zod.number(),
+  "loginId": zod.string()
+})
+
+
+/**
  * Get all todos for the authenticated user
  * @summary Get all todos
  */

@@ -3,10 +3,12 @@ import {
   type AuthenticateResponse,
   AuthenticateResponseSchema,
   type ErrorResponse,
+  type GetMeResponse,
+  GetMeResponseSchema,
 } from "~/api";
 import { config } from "~/config/config";
-import type { AuthService } from "../domain/auth";
-import { AppError } from "../domain/error";
+import type { AuthService } from "~/domain/auth";
+import { AppError, type AppErrorCode } from "~/domain/error";
 
 export class HttpAuthService implements AuthService {
   private readonly baseUrl: string;
@@ -16,35 +18,56 @@ export class HttpAuthService implements AuthService {
   }
 
   async login(data: AuthenticateRequest): Promise<AuthenticateResponse> {
+    const response = await this.fetchApi("/auth/authenticate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-token-delivery": "cookie",
+      },
+      body: JSON.stringify(data),
+    });
+    return this.parseJson(response, AuthenticateResponseSchema);
+  }
+
+  async logout(): Promise<void> {
+    await this.fetchApi("/auth/logout", { method: "POST" });
+  }
+
+  async getMe(): Promise<GetMeResponse> {
+    const response = await this.fetchApi("/auth/me", { method: "GET" });
+    return this.parseJson(response, GetMeResponseSchema);
+  }
+
+  private async fetchApi(path: string, init?: RequestInit): Promise<Response> {
     let response: Response;
     try {
-      response = await fetch(`${this.baseUrl}/auth/authenticate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      response = await fetch(`${this.baseUrl}${path}`, {
+        ...init,
         credentials: "include",
-        body: JSON.stringify(data),
       });
     } catch {
       throw new AppError("NETWORK_ERROR", "Network error occurred");
     }
 
     if (!response.ok) {
-      const code = response.status === 401 ? "UNAUTHENTICATED" : "API_ERROR";
+      const code: AppErrorCode =
+        response.status === 401 ? "UNAUTHENTICATED" : "API_ERROR";
       const message = await this.extractErrorMessage(response);
       throw new AppError(code, message);
     }
 
+    return response;
+  }
+
+  private async parseJson<T>(
+    response: Response,
+    schema: { parse: (data: unknown) => T },
+  ): Promise<T> {
     try {
-      return AuthenticateResponseSchema.parse(await response.json());
+      return schema.parse(await response.json());
     } catch {
       throw new AppError("API_ERROR", "Invalid response format");
     }
-  }
-
-  logout(): void {
-    // httpOnly Cookieのクリアはサーバー側で行う
   }
 
   private async extractErrorMessage(response: Response): Promise<string> {
