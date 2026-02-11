@@ -1,15 +1,7 @@
 import { create } from "zustand";
 import type { GetMeResponse } from "~/api";
-import { AppError } from "~/domain/error";
+import { type AppError, toAppError } from "~/domain/error";
 import { authService } from "~/gateway/auth";
-
-function toAppError(error: unknown): AppError {
-  if (error instanceof AppError) return error;
-  return new AppError(
-    "UNKNOWN",
-    error instanceof Error ? error.message : "Unknown error",
-  );
-}
 
 interface AuthState {
   user: GetMeResponse | null;

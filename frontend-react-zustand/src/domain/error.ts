@@ -13,3 +13,11 @@ export class AppError extends Error {
     this.code = code;
   }
 }
+
+export function toAppError(error: unknown): AppError {
+  if (error instanceof AppError) return error;
+  return new AppError(
+    "UNKNOWN",
+    error instanceof Error ? error.message : "Unknown error",
+  );
+}

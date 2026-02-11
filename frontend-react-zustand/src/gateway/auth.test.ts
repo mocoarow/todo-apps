@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AppError } from "~/domain/error";
 import { HttpAuthService } from "~/gateway/auth";
+import { HttpClient } from "~/gateway/http-client";
 
 const BASE_URL = "http://localhost:8080/api/v1";
 
@@ -19,7 +20,7 @@ describe("HttpAuthService", () => {
   let service: HttpAuthService;
 
   beforeEach(() => {
-    service = new HttpAuthService(BASE_URL);
+    service = new HttpAuthService(new HttpClient(BASE_URL));
     vi.stubGlobal("fetch", vi.fn());
   });
 

@@ -4,14 +4,19 @@ import {
   AuthenticateResponse as AuthenticateResponseSchema,
   type CreateBulkTodosBody,
   type CreateTodoBody,
-  type GetTodosResponse as FindTodoResponseSchema,
   GetMeResponse as GetMeResponseSchema,
+  GetTodosResponse as GetTodosResponseSchema,
   type UpdateTodoBody,
-  type UpdateTodoResponse as UpdateTodoResponseSchema,
+  UpdateTodoResponse as UpdateTodoResponseSchema,
 } from "./types.gen";
 
 // Zod schemas for runtime validation
-export { AuthenticateResponseSchema, GetMeResponseSchema };
+export {
+  AuthenticateResponseSchema,
+  GetTodosResponseSchema,
+  GetMeResponseSchema,
+  UpdateTodoResponseSchema,
+};
 
 // TypeScript types derived from Zod schemas
 export type AuthenticateRequest = z.infer<typeof AuthenticateBody>;
@@ -20,8 +25,8 @@ export type CreateTodoRequest = z.infer<typeof CreateTodoBody>;
 export type CreateBulkTodosRequest = z.infer<typeof CreateBulkTodosBody>;
 export type UpdateTodoRequest = z.infer<typeof UpdateTodoBody>;
 export type UpdateTodoResponse = z.infer<typeof UpdateTodoResponseSchema>;
-export type FindTodoResponse = z.infer<typeof FindTodoResponseSchema>;
-export type FindTodoResponseTodo = FindTodoResponse["todos"][number];
+export type GetTodosResponse = z.infer<typeof GetTodosResponseSchema>;
+export type GetTodosResponseTodo = GetTodosResponse["todos"][number];
 export type CreateTodoResponse = UpdateTodoResponse;
 export type CreateBulkTodosResponse = { todos: CreateTodoResponse[] };
 export type GetMeResponse = z.infer<typeof GetMeResponseSchema>;
