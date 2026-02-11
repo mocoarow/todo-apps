@@ -92,6 +92,36 @@ func (h *AuthHandler) Authenticate(c *gin.Context) {
 	}
 }
 
+// GetMe handles GET /auth/me and returns the authenticated user's ID and login ID.
+func (h *AuthHandler) GetMe(c *gin.Context) {
+	ctx := c.Request.Context()
+	userID := c.GetInt(controller.ContextFieldUserID{})
+	if userID <= 0 {
+		h.logger.WarnContext(ctx, "unauthorized: missing or invalid user ID")
+		c.JSON(http.StatusUnauthorized, NewErrorResponse("unauthorized", http.StatusText(http.StatusUnauthorized)))
+		return
+	}
+
+	loginID := c.GetString(controller.ContextFieldLoginID{})
+	if loginID == "" {
+		h.logger.WarnContext(ctx, "unauthorized: missing login ID")
+		c.JSON(http.StatusUnauthorized, NewErrorResponse("unauthorized", http.StatusText(http.StatusUnauthorized)))
+		return
+	}
+
+	userIDInt32, err := safeIntToInt32(userID)
+	if err != nil {
+		h.logger.ErrorContext(ctx, "convert user ID", slog.Any("error", err))
+		c.JSON(http.StatusInternalServerError, NewErrorResponse("internal_server_error", http.StatusText(http.StatusInternalServerError)))
+		return
+	}
+
+	c.JSON(http.StatusOK, api.GetMeResponse{
+		UserID:  userIDInt32,
+		LoginID: loginID,
+	})
+}
+
 // Logout handles POST /auth/logout and clears the access-token cookie.
 func (h *AuthHandler) Logout(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -105,12 +135,14 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 }
 
 // NewInitAuthRouterFunc returns an InitRouterGroupFunc that registers auth routes under an "auth" group.
-func NewInitAuthRouterFunc(authUsecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int) InitRouterGroupFunc {
+// authMiddleware is applied only to routes that require authentication (e.g. /me).
+func NewInitAuthRouterFunc(authUsecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int, authMiddleware gin.HandlerFunc) InitRouterGroupFunc {
 	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) {
 		auth := parentRouterGroup.Group("auth", middleware...)
 		authHandler := NewAuthHandler(authUsecase, cookieConfig, tokenTTLMin)
 
 		auth.POST("/authenticate", authHandler.Authenticate)
 		auth.POST("/logout", authHandler.Logout)
+		auth.GET("/me", authMiddleware, authHandler.GetMe)
 	}
 }

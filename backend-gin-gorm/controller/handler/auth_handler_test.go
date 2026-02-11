@@ -26,7 +26,29 @@ var testCookieConfig = &controller.CookieConfig{
 	RefreshThresholdMin: 30,
 }
 
+// noopMiddleware is a pass-through middleware for tests that don't require authentication context.
+func noopMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+	}
+}
+
+// fakeAuthMiddleware sets the given userID and loginID into the Gin context,
+// simulating what the real auth middleware does.
+func fakeAuthMiddleware(userID int, loginID string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(controller.ContextFieldUserID{}, userID)
+		c.Set(controller.ContextFieldLoginID{}, loginID)
+		c.Next()
+	}
+}
+
 func initAuthRouter(t *testing.T, ctx context.Context, authUsecase handler.AuthUsecase) *gin.Engine {
+	t.Helper()
+	return initAuthRouterWithMiddleware(t, ctx, authUsecase, noopMiddleware())
+}
+
+func initAuthRouterWithMiddleware(t *testing.T, ctx context.Context, authUsecase handler.AuthUsecase, authMiddleware gin.HandlerFunc) *gin.Engine {
 	t.Helper()
 
 	router, err := handler.InitRootRouterGroup(ctx, config, domain.AppName)
@@ -34,7 +56,7 @@ func initAuthRouter(t *testing.T, ctx context.Context, authUsecase handler.AuthU
 	api := router.Group("api")
 	v1 := api.Group("v1")
 
-	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, testCookieConfig, 60)
+	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, testCookieConfig, 60, authMiddleware)
 	initAuthRouterFunc(v1)
 
 	return router
@@ -288,7 +310,7 @@ func Test_AuthHandler_Logout_shouldReturn500_whenCookieConfigIsNil(t *testing.T)
 	router, err := handler.InitRootRouterGroup(ctx, config, domain.AppName)
 	require.NoError(t, err)
 	v1 := router.Group("api").Group("v1")
-	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, nil, 60)
+	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, nil, 60, noopMiddleware())
 	initAuthRouterFunc(v1)
 
 	w := httptest.NewRecorder()
@@ -317,7 +339,7 @@ func Test_AuthHandler_Authenticate_shouldReturn500_whenCookieConfigIsNilAndXToke
 	router, err := handler.InitRootRouterGroup(ctx, config, domain.AppName)
 	require.NoError(t, err)
 	v1 := router.Group("api").Group("v1")
-	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, nil, 60)
+	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, nil, 60, noopMiddleware())
 	initAuthRouterFunc(v1)
 
 	w := httptest.NewRecorder()
@@ -334,4 +356,54 @@ func Test_AuthHandler_Authenticate_shouldReturn500_whenCookieConfigIsNilAndXToke
 	// then
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	validateErrorResponse(t, respBytes, "cookie_not_configured", "cookie delivery is not configured")
+}
+
+func Test_AuthHandler_GetMe_shouldReturn200_whenAuthenticated(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	authUsecase := NewMockAuthUsecase(t)
+	r := initAuthRouterWithMiddleware(t, ctx, authUsecase, fakeAuthMiddleware(42, "user42"))
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/auth/me", nil)
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	jsonObj := parseJSON(t, respBytes)
+	userIDExpr := parseExpr(t, "$.userId")
+	userID := userIDExpr.Get(jsonObj)
+	require.Len(t, userID, 1)
+	assert.EqualValues(t, 42, userID[0])
+
+	loginIDExpr := parseExpr(t, "$.loginId")
+	loginID := loginIDExpr.Get(jsonObj)
+	require.Len(t, loginID, 1)
+	assert.Equal(t, "user42", loginID[0])
+}
+
+func Test_AuthHandler_GetMe_shouldReturn401_whenUserIDMissing(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	authUsecase := NewMockAuthUsecase(t)
+	r := initAuthRouterWithMiddleware(t, ctx, authUsecase, noopMiddleware())
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/api/v1/auth/me", nil)
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+	validateErrorResponse(t, respBytes, "unauthorized", "Unauthorized")
 }

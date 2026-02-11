@@ -55,6 +55,7 @@ func NewAuthMiddleware(authUsecase AuthUsecase, cookieConfig *controller.CookieC
 		}
 
 		c.Set(controller.ContextFieldUserID{}, output.UserInfo.UserID)
+		c.Set(controller.ContextFieldLoginID{}, output.UserInfo.LoginID)
 		if newCtx, err := telemetry.AddBaggageMembers(ctx, map[string]string{
 			"user_id": strconv.Itoa(output.UserInfo.UserID),
 		}); err != nil {

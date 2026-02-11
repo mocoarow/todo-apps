@@ -83,6 +83,40 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           headers: {}
       security: []
+  /api/v1/auth/me:
+    get:
+      summary: Get current user
+      deprecated: false
+      description: Get the authenticated user's information
+      operationId: getMe
+      tags:
+        - auth
+      parameters: []
+      responses:
+        '200':
+          description: Successfully retrieved user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMeResponse'
+          headers: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers: {}
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
   /api/v1/todo:
     get:
       summary: Get all todos
@@ -458,6 +492,19 @@ components:
         updatedAt:
           type: string
           format: date-time
+    GetMeResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          x-go-name: UserID
+          format: int32
+        loginId:
+          type: string
+          x-go-name: LoginID
+      required:
+        - userId
+        - loginId
     ErrorResponse:
       type: object
       properties:
