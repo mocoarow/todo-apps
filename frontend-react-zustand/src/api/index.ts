@@ -4,8 +4,8 @@ import {
   AuthenticateResponse as AuthenticateResponseSchema,
   type CreateBulkTodosBody,
   type CreateTodoBody,
-  GetMeResponse as GetMeResponseSchema,
   type GetTodosResponse as FindTodoResponseSchema,
+  GetMeResponse as GetMeResponseSchema,
   type UpdateTodoBody,
   type UpdateTodoResponse as UpdateTodoResponseSchema,
 } from "./types.gen";

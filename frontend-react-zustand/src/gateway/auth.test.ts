@@ -52,7 +52,10 @@ describe("HttpAuthService", () => {
     it("should throw UNAUTHENTICATED on 401", async () => {
       // given
       vi.mocked(fetch).mockResolvedValue(
-        jsonResponse({ code: "UNAUTHENTICATED", message: "Invalid credentials" }, 401),
+        jsonResponse(
+          { code: "UNAUTHENTICATED", message: "Invalid credentials" },
+          401,
+        ),
       );
 
       // when & then
@@ -149,7 +152,10 @@ describe("HttpAuthService", () => {
     it("should throw UNAUTHENTICATED on 401", async () => {
       // given
       vi.mocked(fetch).mockResolvedValue(
-        jsonResponse({ code: "UNAUTHENTICATED", message: "Not authenticated" }, 401),
+        jsonResponse(
+          { code: "UNAUTHENTICATED", message: "Not authenticated" },
+          401,
+        ),
       );
 
       // when & then
