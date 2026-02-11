@@ -69,7 +69,7 @@ func run() (int, error) {
 		funcs(v1, authMiddleware)
 	}
 	{
-		funcs := handler.NewInitAuthRouterFunc(authUsecase, cfg.Auth.Cookie, cfg.Auth.AccessTokenTTLMin)
+		funcs := handler.NewInitAuthRouterFunc(authUsecase, cfg.Auth.Cookie, cfg.Auth.AccessTokenTTLMin, authMiddleware)
 		funcs(v1)
 	}
 

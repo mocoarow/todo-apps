@@ -74,6 +74,12 @@ type FindTodoResponseTodo struct {
 	UpdatedAt  time.Time `json:"updatedAt"`
 }
 
+// GetMeResponse defines model for GetMeResponse.
+type GetMeResponse struct {
+	LoginID string `json:"loginId"`
+	UserID  int32  `json:"userId"`
+}
+
 // UpdateTodoRequest defines model for UpdateTodoRequest.
 type UpdateTodoRequest struct {
 	IsComplete bool   `json:"isComplete"`
