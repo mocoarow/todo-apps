@@ -23,7 +23,9 @@ jobs:
           reporter: github-pr-review
           locale: US
           ignore: importas
-          fail_on_error: true
+          fail_level: error
+          exclude: |
+            **/package-lock.json
 
       - name: yamllint
         uses: reviewdog/action-yamllint@v1
@@ -31,7 +33,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           yamllint_flags: -c .github/yamllint.yml .
-          fail_on_error: true
+          fail_level: error
 
       - name: gitleaks
         uses: reviewdog/action-gitleaks@v1
