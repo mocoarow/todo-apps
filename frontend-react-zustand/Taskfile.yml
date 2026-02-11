@@ -50,8 +50,8 @@ tasks:
       - npm test
 
   generate-openapi:
-    desc: "Generate OpenAPI models using openapi-typescript"
+    desc: "Generate OpenAPI Zod schemas using orval"
     cmds:
       - mkdir -p src/api
       - rm -f src/api/types.gen.ts
-      - npx openapi-typescript ../openapi/openapi.yaml -o src/api/types.gen.ts
+      - npx orval

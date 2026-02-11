@@ -5,6 +5,7 @@ tasks:
   check:
     cmds:
       - task -d backend-gin-gorm check
+      - task -d frontend-react-zustand check
       - spectral lint openapi/openapi.yaml --ruleset .spectral.yaml
 
   kics:
@@ -26,3 +27,4 @@ tasks:
     desc: "Generate OpenAPI models"
     cmds:
       - task -d backend-gin-gorm generate-openapi
+      - task -d frontend-react-zustand generate-openapi

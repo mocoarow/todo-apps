@@ -1,7 +1,8 @@
-import type {
-  AuthenticateRequest,
-  AuthenticateResponse,
-  ErrorResponse,
+import {
+  type AuthenticateRequest,
+  type AuthenticateResponse,
+  AuthenticateResponseSchema,
+  type ErrorResponse,
 } from "~/api";
 import { config } from "~/config/config";
 import type { AuthService } from "../domain/auth";
@@ -36,7 +37,7 @@ export class HttpAuthService implements AuthService {
     }
 
     try {
-      return (await response.json()) as AuthenticateResponse;
+      return AuthenticateResponseSchema.parse(await response.json());
     } catch {
       throw new AppError("API_ERROR", "Invalid response format");
     }

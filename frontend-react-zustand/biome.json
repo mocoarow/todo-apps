@@ -17,7 +17,7 @@
       "!node_modules",
       "!src/components/ui/*",
       "!src/hooks/use-mobile.tsx",
-      "!src/api",
+      "!src/api/types.gen.ts",
       "!src/index.css"
     ]
   },
