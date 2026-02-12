@@ -91,6 +91,11 @@ func (r *TodoRepository) CreateTodo(ctx context.Context, input *domain.CreateTod
 		return nil, fmt.Errorf("create todo: %w", result.Error)
 	}
 
+	// Re-read to get DB-precision timestamps
+	if result := r.db.WithContext(ctx).First(entity, entity.ID); result.Error != nil {
+		return nil, fmt.Errorf("reload created todo: %w", result.Error)
+	}
+
 	todo, err := entity.toTodo()
 	if err != nil {
 		return nil, fmt.Errorf("to todo: %w", err)
@@ -111,12 +116,11 @@ func (r *TodoRepository) UpdateTodo(ctx context.Context, input *domain.UpdateTod
 		return nil, fmt.Errorf("find todo: %w", result.Error)
 	}
 
-	// Update the fields
-	entity.Text = input.Text
-	entity.IsComplete = input.IsComplete
-
-	// Save the changes
-	if result := r.db.WithContext(ctx).Save(&entity); result.Error != nil {
+	// Update only the changed fields (preserves CreatedAt)
+	if result := r.db.WithContext(ctx).Model(&entity).Updates(map[string]any{
+		"text":        input.Text,
+		"is_complete": input.IsComplete,
+	}); result.Error != nil {
 		return nil, fmt.Errorf("update todo: %w", result.Error)
 	}
 

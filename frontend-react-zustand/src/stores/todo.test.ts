@@ -5,6 +5,8 @@ import { useTodoStore } from "~/stores/todo";
 vi.mock("~/gateway/todo", () => ({
   todoService: {
     getTodos: vi.fn(),
+    createTodo: vi.fn(),
+    updateTodo: vi.fn(),
   },
 }));
 
@@ -21,6 +23,7 @@ describe("useTodoStore", () => {
     useTodoStore.setState({
       todos: [],
       isLoading: false,
+      isCreating: false,
       error: null,
     });
   });
@@ -103,6 +106,144 @@ describe("useTodoStore", () => {
       // then
       expect(capturedLoading).toBe(true);
       expect(useTodoStore.getState().isLoading).toBe(false);
+    });
+  });
+
+  describe("createTodo", () => {
+    it("should call createTodo and re-fetch todos on success", async () => {
+      // given
+      const todos = [
+        {
+          id: 1,
+          text: "Buy milk",
+          isComplete: false,
+          createdAt: "2025-01-01T00:00:00Z",
+          updatedAt: "2025-01-01T00:00:00Z",
+        },
+      ];
+      mockTodoService.createTodo.mockResolvedValue({
+        id: 1,
+        text: "Buy milk",
+        isComplete: false,
+        createdAt: "2025-01-01T00:00:00Z",
+        updatedAt: "2025-01-01T00:00:00Z",
+      });
+      mockTodoService.getTodos.mockResolvedValue({ todos });
+
+      // when
+      await useTodoStore.getState().createTodo("Buy milk");
+
+      // then
+      expect(mockTodoService.createTodo).toHaveBeenCalledWith({
+        text: "Buy milk",
+      });
+      expect(mockTodoService.getTodos).toHaveBeenCalled();
+      expect(useTodoStore.getState().todos).toEqual(todos);
+      expect(useTodoStore.getState().isCreating).toBe(false);
+    });
+
+    it("should set error on failure", async () => {
+      // given
+      const appError = new AppError("API_ERROR", "Create failed");
+      mockTodoService.createTodo.mockRejectedValue(appError);
+
+      // when
+      await useTodoStore.getState().createTodo("Buy milk");
+
+      // then
+      expect(useTodoStore.getState().error).toBe(appError);
+      expect(useTodoStore.getState().isCreating).toBe(false);
+    });
+
+    it("should set isCreating true during create", async () => {
+      // given
+      let capturedLoading = false;
+      mockTodoService.createTodo.mockImplementation(async () => {
+        capturedLoading = useTodoStore.getState().isCreating;
+        return {
+          id: 1,
+          text: "Buy milk",
+          isComplete: false,
+          createdAt: "2025-01-01T00:00:00Z",
+          updatedAt: "2025-01-01T00:00:00Z",
+        };
+      });
+      mockTodoService.getTodos.mockResolvedValue({ todos: [] });
+
+      // when
+      await useTodoStore.getState().createTodo("Buy milk");
+
+      // then
+      expect(capturedLoading).toBe(true);
+      expect(useTodoStore.getState().isCreating).toBe(false);
+    });
+  });
+
+  describe("updateTodo", () => {
+    it("should call updateTodo and re-fetch todos on success", async () => {
+      // given
+      const todos = [
+        {
+          id: 1,
+          text: "Buy milk",
+          isComplete: true,
+          createdAt: "2025-01-01T00:00:00Z",
+          updatedAt: "2025-01-02T00:00:00Z",
+        },
+      ];
+      mockTodoService.updateTodo.mockResolvedValue(todos[0]!);
+      mockTodoService.getTodos.mockResolvedValue({ todos });
+
+      // when
+      await useTodoStore
+        .getState()
+        .updateTodo(1, { text: "Buy milk", isComplete: true });
+
+      // then
+      expect(mockTodoService.updateTodo).toHaveBeenCalledWith(1, {
+        text: "Buy milk",
+        isComplete: true,
+      });
+      expect(mockTodoService.getTodos).toHaveBeenCalled();
+      expect(useTodoStore.getState().todos).toEqual(todos);
+    });
+
+    it("should set error on failure", async () => {
+      // given
+      const appError = new AppError("API_ERROR", "Update failed");
+      mockTodoService.updateTodo.mockRejectedValue(appError);
+
+      // when
+      await useTodoStore
+        .getState()
+        .updateTodo(1, { text: "Buy milk", isComplete: true });
+
+      // then
+      expect(useTodoStore.getState().error).toBe(appError);
+    });
+
+    it("should not set isLoading during update", async () => {
+      // given
+      let capturedLoading = false;
+      mockTodoService.updateTodo.mockImplementation(async () => {
+        capturedLoading = useTodoStore.getState().isLoading;
+        return {
+          id: 1,
+          text: "Buy milk",
+          isComplete: true,
+          createdAt: "2025-01-01T00:00:00Z",
+          updatedAt: "2025-01-02T00:00:00Z",
+        };
+      });
+      mockTodoService.getTodos.mockResolvedValue({ todos: [] });
+
+      // when
+      await useTodoStore
+        .getState()
+        .updateTodo(1, { text: "Buy milk", isComplete: true });
+
+      // then
+      expect(capturedLoading).toBe(false);
     });
   });
 

@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GetTodosResponseTodo } from "~/api";
 import { TodoItem } from "./TodoItem";
 
@@ -26,7 +27,13 @@ describe("TodoItem", () => {
     const todo = createTodo();
 
     // when
-    render(<TodoItem todo={todo} />);
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={vi.fn()}
+      />,
+    );
 
     // then
     expect(screen.getByText("Buy milk")).toBeDefined();
@@ -37,7 +44,13 @@ describe("TodoItem", () => {
     const todo = createTodo({ text: "Walk dog", isComplete: true });
 
     // when
-    render(<TodoItem todo={todo} />);
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={vi.fn()}
+      />,
+    );
 
     // then
     const span = screen.getByText("Walk dog");
@@ -49,7 +62,13 @@ describe("TodoItem", () => {
     const todo = createTodo();
 
     // when
-    render(<TodoItem todo={todo} />);
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={vi.fn()}
+      />,
+    );
 
     // then
     const span = screen.getByText("Buy milk");
@@ -61,21 +80,185 @@ describe("TodoItem", () => {
     const todo = createTodo();
 
     // when
-    render(<TodoItem todo={todo} />);
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={vi.fn()}
+      />,
+    );
 
     // then
     expect(screen.getByRole("checkbox", { name: "Buy milk" })).toBeDefined();
   });
 
-  it("should render disabled checkbox", () => {
+  it("should render enabled checkbox", () => {
     // given
     const todo = createTodo();
 
     // when
-    render(<TodoItem todo={todo} />);
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={vi.fn()}
+      />,
+    );
 
     // then
     const checkbox = screen.getByRole("checkbox", { name: "Buy milk" });
-    expect(checkbox).toBeDisabled();
+    expect(checkbox).not.toBeDisabled();
+  });
+
+  it("should call onToggleComplete when checkbox is clicked", async () => {
+    // given
+    const user = userEvent.setup();
+    const onToggleComplete = vi.fn();
+    const todo = createTodo();
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={onToggleComplete}
+        onUpdateText={vi.fn()}
+      />,
+    );
+
+    // when
+    await user.click(screen.getByRole("checkbox", { name: "Buy milk" }));
+
+    // then
+    expect(onToggleComplete).toHaveBeenCalledWith(1, true);
+  });
+
+  it("should call onToggleComplete with false for completed todo", async () => {
+    // given
+    const user = userEvent.setup();
+    const onToggleComplete = vi.fn();
+    const todo = createTodo({ isComplete: true });
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={onToggleComplete}
+        onUpdateText={vi.fn()}
+      />,
+    );
+
+    // when
+    await user.click(screen.getByRole("checkbox", { name: "Buy milk" }));
+
+    // then
+    expect(onToggleComplete).toHaveBeenCalledWith(1, false);
+  });
+
+  it("should enter edit mode on double-click", async () => {
+    // given
+    const user = userEvent.setup();
+    const todo = createTodo();
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={vi.fn()}
+      />,
+    );
+
+    // when
+    await user.dblClick(screen.getByText("Buy milk"));
+
+    // then
+    const input = screen.getByDisplayValue("Buy milk");
+    expect(input).toBeDefined();
+  });
+
+  it("should call onUpdateText on Enter in edit mode", async () => {
+    // given
+    const user = userEvent.setup();
+    const onUpdateText = vi.fn();
+    const todo = createTodo();
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={onUpdateText}
+      />,
+    );
+
+    // when
+    await user.dblClick(screen.getByText("Buy milk"));
+    const input = screen.getByDisplayValue("Buy milk");
+    await user.clear(input);
+    await user.type(input, "Buy eggs{Enter}");
+
+    // then
+    expect(onUpdateText).toHaveBeenCalledWith(1, "Buy eggs");
+  });
+
+  it("should cancel edit on Escape", async () => {
+    // given
+    const user = userEvent.setup();
+    const onUpdateText = vi.fn();
+    const todo = createTodo();
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={onUpdateText}
+      />,
+    );
+
+    // when
+    await user.dblClick(screen.getByText("Buy milk"));
+    const input = screen.getByDisplayValue("Buy milk");
+    await user.clear(input);
+    await user.type(input, "Buy eggs{Escape}");
+
+    // then
+    expect(onUpdateText).not.toHaveBeenCalled();
+    expect(screen.getByText("Buy milk")).toBeDefined();
+  });
+
+  it("should call onUpdateText on blur in edit mode", async () => {
+    // given
+    const user = userEvent.setup();
+    const onUpdateText = vi.fn();
+    const todo = createTodo();
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={onUpdateText}
+      />,
+    );
+
+    // when
+    await user.dblClick(screen.getByText("Buy milk"));
+    const input = screen.getByDisplayValue("Buy milk");
+    await user.clear(input);
+    await user.type(input, "Buy eggs");
+    await user.tab();
+
+    // then
+    expect(onUpdateText).toHaveBeenCalledWith(1, "Buy eggs");
+  });
+
+  it("should not call onUpdateText if text is unchanged on blur", async () => {
+    // given
+    const user = userEvent.setup();
+    const onUpdateText = vi.fn();
+    const todo = createTodo();
+    render(
+      <TodoItem
+        todo={todo}
+        onToggleComplete={vi.fn()}
+        onUpdateText={onUpdateText}
+      />,
+    );
+
+    // when
+    await user.dblClick(screen.getByText("Buy milk"));
+    await user.tab();
+
+    // then
+    expect(onUpdateText).not.toHaveBeenCalled();
   });
 });
