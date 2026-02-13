@@ -16,6 +16,7 @@ export {
   GetTodosResponseSchema,
   GetMeResponseSchema,
   UpdateTodoResponseSchema,
+  UpdateTodoResponseSchema as CreateTodoResponseSchema,
 };
 
 // TypeScript types derived from Zod schemas

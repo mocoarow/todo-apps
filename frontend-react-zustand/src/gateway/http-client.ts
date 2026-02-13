@@ -34,8 +34,14 @@ export class HttpClient {
     response: Response,
     schema: { parse: (data: unknown) => T },
   ): Promise<T> {
+    let data: unknown;
     try {
-      return schema.parse(await response.json());
+      data = await response.json();
+    } catch {
+      throw new AppError("API_ERROR", "Invalid response format");
+    }
+    try {
+      return schema.parse(data);
     } catch {
       throw new AppError("API_ERROR", "Invalid response format");
     }

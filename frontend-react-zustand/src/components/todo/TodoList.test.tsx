@@ -1,5 +1,5 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GetTodosResponseTodo } from "~/api";
 import { TodoList } from "./TodoList";
 
@@ -16,6 +16,11 @@ function createTodo(
   };
 }
 
+const defaultCallbacks = {
+  onToggleComplete: vi.fn(),
+  onUpdateText: vi.fn(),
+};
+
 describe("TodoList", () => {
   afterEach(() => {
     cleanup();
@@ -26,7 +31,7 @@ describe("TodoList", () => {
     const todos: GetTodosResponseTodo[] = [];
 
     // when
-    render(<TodoList todos={todos} />);
+    render(<TodoList todos={todos} {...defaultCallbacks} />);
 
     // then
     expect(screen.getByText("No todos yet.")).toBeDefined();
@@ -40,7 +45,7 @@ describe("TodoList", () => {
     ];
 
     // when
-    render(<TodoList todos={todos} />);
+    render(<TodoList todos={todos} {...defaultCallbacks} />);
 
     // then
     expect(screen.getByText("Buy milk")).toBeDefined();
@@ -55,7 +60,7 @@ describe("TodoList", () => {
     ];
 
     // when
-    render(<TodoList todos={todos} />);
+    render(<TodoList todos={todos} {...defaultCallbacks} />);
 
     // then
     const listItems = screen.getAllByRole("listitem");

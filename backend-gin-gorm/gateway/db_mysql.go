@@ -69,7 +69,8 @@ func OpenMySQLWithDSN(dsn string, logLevel slog.Level, appName string) (*gorm.DB
 	}
 
 	gormConfig := gorm.Config{ //nolint:exhaustruct
-		Logger: slog_gorm.New(options...),
+		Logger:  slog_gorm.New(options...),
+		NowFunc: func() time.Time { return time.Now().UTC() },
 	}
 
 	db, err := gorm.Open(gormDialector, &gormConfig)

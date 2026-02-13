@@ -108,4 +108,117 @@ describe("HttpTodoService", () => {
       });
     });
   });
+
+  describe("createTodo", () => {
+    it("should return created todo on success", async () => {
+      // given
+      const body = {
+        id: 1,
+        text: "Buy milk",
+        isComplete: false,
+        createdAt: "2025-01-01T00:00:00Z",
+        updatedAt: "2025-01-01T00:00:00Z",
+      };
+      vi.mocked(fetch).mockResolvedValue(jsonResponse(body));
+
+      // when
+      const result = await service.createTodo({ text: "Buy milk" });
+
+      // then
+      expect(result).toEqual(body);
+      expect(fetch).toHaveBeenCalledWith(`${BASE_URL}/todo`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "Buy milk" }),
+      });
+    });
+
+    it("should throw UNAUTHENTICATED on 401", async () => {
+      // given
+      vi.mocked(fetch).mockResolvedValue(
+        jsonResponse(
+          { code: "UNAUTHENTICATED", message: "Not authenticated" },
+          401,
+        ),
+      );
+
+      // when & then
+      await expect(
+        service.createTodo({ text: "Buy milk" }),
+      ).rejects.toMatchObject({
+        code: "UNAUTHENTICATED",
+      });
+    });
+
+    it("should throw NETWORK_ERROR on fetch failure", async () => {
+      // given
+      vi.mocked(fetch).mockRejectedValue(new TypeError("Failed to fetch"));
+
+      // when & then
+      await expect(
+        service.createTodo({ text: "Buy milk" }),
+      ).rejects.toMatchObject({
+        code: "NETWORK_ERROR",
+      });
+    });
+  });
+
+  describe("updateTodo", () => {
+    it("should return updated todo on success", async () => {
+      // given
+      const body = {
+        id: 1,
+        text: "Buy milk",
+        isComplete: true,
+        createdAt: "2025-01-01T00:00:00Z",
+        updatedAt: "2025-01-02T00:00:00Z",
+      };
+      vi.mocked(fetch).mockResolvedValue(jsonResponse(body));
+
+      // when
+      const result = await service.updateTodo(1, {
+        text: "Buy milk",
+        isComplete: true,
+      });
+
+      // then
+      expect(result).toEqual(body);
+      expect(fetch).toHaveBeenCalledWith(`${BASE_URL}/todo/1`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "Buy milk", isComplete: true }),
+      });
+    });
+
+    it("should throw UNAUTHENTICATED on 401", async () => {
+      // given
+      vi.mocked(fetch).mockResolvedValue(
+        jsonResponse(
+          { code: "UNAUTHENTICATED", message: "Not authenticated" },
+          401,
+        ),
+      );
+
+      // when & then
+      await expect(
+        service.updateTodo(1, { text: "Buy milk", isComplete: true }),
+      ).rejects.toMatchObject({
+        code: "UNAUTHENTICATED",
+      });
+    });
+
+    it("should throw NETWORK_ERROR on fetch failure", async () => {
+      // given
+      vi.mocked(fetch).mockRejectedValue(new TypeError("Failed to fetch"));
+
+      // when & then
+      await expect(
+        service.updateTodo(1, { text: "Buy milk", isComplete: true }),
+      ).rejects.toMatchObject({
+        code: "NETWORK_ERROR",
+      });
+    });
+  });
 });

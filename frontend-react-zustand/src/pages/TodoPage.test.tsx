@@ -17,6 +17,8 @@ vi.mock("~/gateway/auth", () => ({
 vi.mock("~/gateway/todo", () => ({
   todoService: {
     getTodos: vi.fn(),
+    createTodo: vi.fn(),
+    updateTodo: vi.fn(),
   },
 }));
 
@@ -30,6 +32,7 @@ describe("TodoPage", () => {
     useTodoStore.setState({
       todos: [],
       isLoading: false,
+      isCreating: false,
       error: null,
     });
   });
@@ -156,5 +159,59 @@ describe("TodoPage", () => {
 
     // then
     expect(screen.getByRole("button", { name: "Logout" })).toBeDisabled();
+  });
+
+  it("should render the create todo form", () => {
+    // given / when
+    render(<TodoPage />);
+
+    // then
+    expect(screen.getByPlaceholderText("What needs to be done?")).toBeDefined();
+    expect(screen.getByRole("button", { name: "Add" })).toBeDefined();
+  });
+
+  it("should call createTodo when form is submitted", async () => {
+    // given
+    const user = userEvent.setup();
+    const mockCreateTodo = vi.fn();
+    useTodoStore.setState({ createTodo: mockCreateTodo });
+    render(<TodoPage />);
+
+    // when
+    await user.type(
+      screen.getByPlaceholderText("What needs to be done?"),
+      "New task{Enter}",
+    );
+
+    // then
+    expect(mockCreateTodo).toHaveBeenCalledWith("New task");
+  });
+
+  it("should call updateTodo when checkbox is toggled", async () => {
+    // given
+    const user = userEvent.setup();
+    const mockUpdateTodo = vi.fn();
+    useTodoStore.setState({
+      todos: [
+        {
+          id: 1,
+          text: "Buy milk",
+          isComplete: false,
+          createdAt: "2025-01-01T00:00:00Z",
+          updatedAt: "2025-01-01T00:00:00Z",
+        },
+      ],
+      updateTodo: mockUpdateTodo,
+    });
+    render(<TodoPage />);
+
+    // when
+    await user.click(screen.getByRole("checkbox", { name: "Buy milk" }));
+
+    // then
+    expect(mockUpdateTodo).toHaveBeenCalledWith(1, {
+      text: "Buy milk",
+      isComplete: true,
+    });
   });
 });

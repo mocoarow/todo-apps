@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { TodoCreateForm } from "~/components/todo/TodoCreateForm";
 import { TodoList } from "~/components/todo/TodoList";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -7,11 +8,37 @@ import { useTodoStore } from "~/stores/todo";
 
 export function TodoPage() {
   const { user, logout, isLoading: isAuthLoading } = useAuthStore();
-  const { todos, isLoading, error, fetchTodos } = useTodoStore();
+  const {
+    todos,
+    isLoading,
+    isCreating,
+    error,
+    fetchTodos,
+    createTodo,
+    updateTodo,
+  } = useTodoStore();
 
   useEffect(() => {
     fetchTodos();
   }, [fetchTodos]);
+
+  const handleToggleComplete = useCallback(
+    (id: number, isComplete: boolean) => {
+      const todo = todos.find((t) => t.id === id);
+      if (todo == null) return;
+      updateTodo(id, { text: todo.text, isComplete });
+    },
+    [todos, updateTodo],
+  );
+
+  const handleUpdateText = useCallback(
+    (id: number, text: string) => {
+      const todo = todos.find((t) => t.id === id);
+      if (todo == null) return;
+      updateTodo(id, { text, isComplete: todo.isComplete });
+    },
+    [todos, updateTodo],
+  );
 
   return (
     <div className="mx-auto flex min-h-svh max-w-2xl flex-col gap-6 p-6">
@@ -34,7 +61,8 @@ export function TodoPage() {
         <CardHeader>
           <CardTitle>Todos</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <TodoCreateForm onCreateTodo={createTodo} isLoading={isCreating} />
           {isLoading ? (
             <p className="text-muted-foreground py-8 text-center">Loading...</p>
           ) : error ? (
@@ -45,7 +73,11 @@ export function TodoPage() {
               </Button>
             </div>
           ) : (
-            <TodoList todos={todos} />
+            <TodoList
+              todos={todos}
+              onToggleComplete={handleToggleComplete}
+              onUpdateText={handleUpdateText}
+            />
           )}
         </CardContent>
       </Card>
