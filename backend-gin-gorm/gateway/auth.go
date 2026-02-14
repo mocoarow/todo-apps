@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -110,12 +111,12 @@ func (m *AuthTokenManager) parseToken(tokenString string) (*userClaims, error) {
 		return nil, fmt.Errorf("parse token: %w", err)
 	}
 	if !currentToken.Valid {
-		return nil, fmt.Errorf("invalid token")
+		return nil, errors.New("invalid token")
 	}
 
 	currentClaims, ok := currentToken.Claims.(*userClaims)
 	if !ok {
-		return nil, fmt.Errorf("invalid claims")
+		return nil, errors.New("invalid claims")
 	}
 
 	return currentClaims, nil

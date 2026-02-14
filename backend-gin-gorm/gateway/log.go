@@ -169,7 +169,7 @@ func stringToLogLevel(value string) slog.Level {
 	case "error":
 		return slog.LevelError
 	default:
-		slog.Info(fmt.Sprintf("Unsupported log level: %s", value))
+		slog.Info("Unsupported log level: " + value)
 
 		return slog.LevelWarn
 	}

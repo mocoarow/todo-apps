@@ -1,7 +1,7 @@
 package usecase_test
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 	"time"
 
@@ -58,7 +58,7 @@ func Test_AuthRefreshTokenQuery_Execute_shouldReturnError_whenRefreshFails(t *te
 	// given
 	expiresAt := time.Now().Add(5 * time.Minute)
 	mockRefresher := NewMockAuthTokenRefresher(t)
-	mockRefresher.EXPECT().RefreshToken("user1", 1, expiresAt).Return("", fmt.Errorf("token refresh failed")).Once()
+	mockRefresher.EXPECT().RefreshToken("user1", 1, expiresAt).Return("", errors.New("token refresh failed")).Once()
 	query := usecase.NewAuthRefreshTokenQuery(mockRefresher)
 	input, err := domain.NewRefreshTokenInput("user1", 1, expiresAt)
 	require.NoError(t, err)

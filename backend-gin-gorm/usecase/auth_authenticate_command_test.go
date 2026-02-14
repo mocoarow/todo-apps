@@ -1,7 +1,7 @@
 package usecase_test
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -112,7 +112,7 @@ func Test_AuthenticateCommand_Execute_shouldReturnError_whenCreateTokenFails(t *
 
 	// given
 	mockCreator := NewMockAuthTokenCreator(t)
-	mockCreator.EXPECT().CreateToken("user1", 1).Return("", fmt.Errorf("token creation failed")).Once()
+	mockCreator.EXPECT().CreateToken("user1", 1).Return("", errors.New("token creation failed")).Once()
 	cmd := usecase.NewAuthenticateCommand(mockCreator)
 	input, err := domain.NewAuthenticateInput("user1", "password1")
 	require.NoError(t, err)

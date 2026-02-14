@@ -7,12 +7,16 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/joho/godotenv"
+
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/gateway"
 )
 
 var dbc *gateway.DBConnection
 
 func TestMain(m *testing.M) {
+	_ = godotenv.Load("../.env.test")
+
 	tmpdbc, err := openTestMySQL()
 	if err != nil {
 		slog.Error("failed to open test MySQL", slog.Any("error", err))

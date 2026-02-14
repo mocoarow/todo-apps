@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -143,7 +144,7 @@ func Test_AuthHandler_Authenticate_shouldReturn500_whenUsecaseReturnsUnexpectedE
 
 	// given
 	authUsecase := NewMockAuthUsecase(t)
-	authUsecase.EXPECT().Authenticate(mock.Anything).Return(nil, fmt.Errorf("unexpected error")).Once()
+	authUsecase.EXPECT().Authenticate(mock.Anything).Return(nil, errors.New("unexpected error")).Once()
 	r := initAuthRouter(t, ctx, authUsecase)
 	w := httptest.NewRecorder()
 	body := `{"loginId":"user1","password":"password1"}`

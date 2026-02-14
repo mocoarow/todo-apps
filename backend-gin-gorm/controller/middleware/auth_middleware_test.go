@@ -2,7 +2,7 @@ package middleware_test
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -110,7 +110,7 @@ func Test_AuthMiddleware_shouldReturn401_whenGetUserInfoReturnsError(t *testing.
 	ctx := context.Background()
 	// given
 	mockUsecase := NewMockAuthUsecase(t)
-	mockUsecase.EXPECT().GetUserInfo(mock.Anything).Return(nil, fmt.Errorf("invalid token")).Once()
+	mockUsecase.EXPECT().GetUserInfo(mock.Anything).Return(nil, errors.New("invalid token")).Once()
 	r := setupRouter(t, mockUsecase)
 	w := httptest.NewRecorder()
 
