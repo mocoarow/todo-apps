@@ -1,3 +1,4 @@
+---
 version: '3'
 
 tasks:
@@ -31,6 +32,13 @@ tasks:
     desc: "Build web app"
     cmds:
       - flutter build web --release
+
+  # Check command (for root Taskfile consistency)
+  check:
+    desc: "Run format check and static analysis"
+    cmds:
+      - task: format:check
+      - task: lint
 
   # Code quality commands
   lint:
