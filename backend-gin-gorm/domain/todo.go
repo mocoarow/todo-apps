@@ -2,12 +2,13 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 )
 
 // ErrTodoNotFound is returned when a requested todo does not exist.
-var ErrTodoNotFound = fmt.Errorf("todo not found")
+var ErrTodoNotFound = errors.New("todo not found")
 
 // Todo represents a single todo item belonging to a user.
 type Todo struct {

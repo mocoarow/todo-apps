@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
@@ -34,7 +35,7 @@ func (u *CreateBulkTodosCommand) Execute(ctx context.Context, input *domain.Crea
 				return nil, fmt.Errorf("create todo: %w", err)
 			}
 			if todo == nil {
-				return nil, fmt.Errorf("created todo is nil")
+				return nil, errors.New("created todo is nil")
 			}
 
 			todos = append(todos, *todo)

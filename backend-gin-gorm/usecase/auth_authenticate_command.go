@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -52,18 +53,18 @@ func (c *AuthenticateCommand) Execute(input *domain.AuthenticateInput) (*domain.
 func (c *AuthenticateCommand) authenticate(loginID string, password string) (int, error) {
 	userIDMatches := c.regexpUserID.FindStringSubmatch(loginID)
 	if len(userIDMatches) != 2 {
-		return 0, fmt.Errorf("invalid login ID format")
+		return 0, errors.New("invalid login ID format")
 	}
 	userIDStr := userIDMatches[1]
 
 	passwordMatches := c.regexpPassword.FindStringSubmatch(password)
 	if len(passwordMatches) != 2 {
-		return 0, fmt.Errorf("invalid password format")
+		return 0, errors.New("invalid password format")
 	}
 	passwordNum := passwordMatches[1]
 
 	if userIDStr != passwordNum {
-		return 0, fmt.Errorf("invalid login ID or password")
+		return 0, errors.New("invalid login ID or password")
 	}
 
 	userID, err := strconv.Atoi(userIDStr)

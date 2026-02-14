@@ -1,7 +1,7 @@
 package usecase_test
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 	"time"
 
@@ -39,7 +39,7 @@ func Test_AuthGetUserInfoQuery_Execute_shouldReturnError_whenParseTokenFails(t *
 
 	// given
 	mockParser := NewMockAuthTokenParser(t)
-	mockParser.EXPECT().ParseToken("invalid-token").Return(nil, fmt.Errorf("token parse failed")).Once()
+	mockParser.EXPECT().ParseToken("invalid-token").Return(nil, errors.New("token parse failed")).Once()
 	query := usecase.NewAuthGetUserInfoQuery(mockParser)
 	input, err := domain.NewGetUserInfoInput("invalid-token")
 	require.NoError(t, err)

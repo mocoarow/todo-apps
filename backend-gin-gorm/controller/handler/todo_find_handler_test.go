@@ -2,7 +2,7 @@ package handler_test
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -73,7 +73,7 @@ func Test_TodoHandler_FindTodos_shouldReturn500_whenUsecaseReturnsError(t *testi
 	// given
 	userID := randomUserID()
 	todoUsecase := NewMockTodoUsecase(t)
-	todoUsecase.EXPECT().FindTodos(mock.Anything, userID).Return(nil, fmt.Errorf("database error")).Once()
+	todoUsecase.EXPECT().FindTodos(mock.Anything, userID).Return(nil, errors.New("database error")).Once()
 	r := initTodoRouter(t, ctx, todoUsecase, userID)
 	w := httptest.NewRecorder()
 

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/gateway"
@@ -15,6 +16,8 @@ import (
 var db *gorm.DB
 
 func TestMain(m *testing.M) {
+	_ = godotenv.Load("../.env.test")
+
 	tmpdb, err := OpenTestMySQL()
 	if err != nil {
 		slog.Error("failed to open test MySQL", slog.Any("error", err))
