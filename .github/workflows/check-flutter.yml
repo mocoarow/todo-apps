@@ -1,0 +1,50 @@
+---
+name: Check Flutter
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "frontend-flutter/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend-flutter/**"
+permissions: {}
+jobs:
+  check:
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    strategy:
+      matrix:
+        workdir:
+          - frontend-flutter
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+        working-directory: ${{ matrix.workdir }}
+
+      - name: Check format
+        run: dart format --line-length=120 --output=none --set-exit-if-changed .
+        working-directory: ${{ matrix.workdir }}
+
+      - name: Run static analysis
+        run: flutter analyze
+        working-directory: ${{ matrix.workdir }}
+
+      - name: Run tests
+        run: flutter test
+        working-directory: ${{ matrix.workdir }}

@@ -1,0 +1,109 @@
+---
+version: '3'
+
+tasks:
+  # Development commands
+  dev:
+    desc: "Run the app in debug mode"
+    cmds:
+      - flutter run
+
+  dev:chrome:
+    desc: "Run the app on Chrome"
+    cmds:
+      - flutter run -d chrome
+
+  dev:android:
+    desc: "Run the app on Android"
+    cmds:
+      - flutter run -d android
+
+  # Build commands
+  build:
+    desc: "Build the app for all platforms"
+    deps: [build:android, build:web]
+
+  build:android:
+    desc: "Build Android APK"
+    cmds:
+      - flutter build apk --release
+
+  build:web:
+    desc: "Build web app"
+    cmds:
+      - flutter build web --release
+
+  # Check command (for root Taskfile consistency)
+  check:
+    desc: "Run format check and static analysis"
+    cmds:
+      - task: format:check
+      - task: lint
+
+  # Code quality commands
+  lint:
+    desc: "Run static analysis"
+    cmds:
+      - flutter analyze
+
+  lint:fix:
+    desc: "Apply automatic fixes"
+    cmds:
+      - dart fix --apply
+
+  format:
+    desc: "Format all Dart code with 120 character line length"
+    cmds:
+      - dart format --line-length=120 .
+
+  format:check:
+    desc: "Check if code is properly formatted with 120 character line length"
+    cmds:
+      - dart format --line-length=120 --output=none --set-exit-if-changed .
+
+  quality:
+    desc: "Run all code quality checks"
+    deps: [format:check, lint, test]
+
+  # Testing commands
+  test:
+    desc: "Run all tests"
+    cmds:
+      - flutter test
+
+  test:coverage:
+    desc: "Run tests with coverage"
+    cmds:
+      - flutter test --coverage
+      - genhtml coverage/lcov.info -o coverage/html
+
+  # Code generation commands
+  generate:
+    desc: "Run code generation"
+    cmds:
+      - dart run build_runner build --delete-conflicting-outputs
+
+  generate:watch:
+    desc: "Watch for changes and regenerate code"
+    cmds:
+      - dart run build_runner watch
+
+  generate:clean:
+    desc: "Clean and regenerate code"
+    cmds:
+      - dart run build_runner clean
+      - dart run build_runner build --delete-conflicting-outputs
+
+  # Help command
+  help:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  # Doctor command
+  doctor:
+    desc: "Check Flutter installation and project health"
+    cmds:
+      - flutter doctor -v
+      - flutter pub deps
+      - task: lint

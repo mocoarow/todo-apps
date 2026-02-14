@@ -6,6 +6,7 @@ tasks:
     cmds:
       - task -d backend-gin-gorm check
       - task -d frontend-react-zustand check
+      - task -d frontend-flutter check
       - spectral lint openapi/openapi.yaml --ruleset .spectral.yaml
 
   kics:
@@ -15,6 +16,7 @@ tasks:
   test:
     cmds:
       - task -d backend-gin-gorm test
+      - task -d frontend-flutter test
 
   download-openapi-yaml:
     desc: "Download openapi.yaml from Apidog"
