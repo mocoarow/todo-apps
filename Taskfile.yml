@@ -30,3 +30,4 @@ tasks:
     cmds:
       - task -d backend-gin-gorm generate-openapi
       - task -d frontend-react-zustand generate-openapi
+      - task -d frontend-flutter generate-openapi

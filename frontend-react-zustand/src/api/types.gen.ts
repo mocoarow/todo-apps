@@ -11,7 +11,7 @@ import * as zod from 'zod';
  * Authenticate user with login ID and password
  * @summary User authentication
  */
-export const authenticateHeaderXTokenDeliveryDefault = `json`;
+export const authenticateHeaderXTokenDeliveryDefault = `cookie`;
 
 export const AuthenticateHeader = zod.object({
   "X-Token-Delivery": zod.enum(['json', 'cookie']).default(authenticateHeaderXTokenDeliveryDefault).describe('Token delivery method (json or cookie)')
