@@ -15,8 +15,7 @@ void main() {
 
   setUp(() {
     mockRepository = MockAuthRepository();
-    when(() => mockRepository.getMe())
-        .thenThrow(const UnauthenticatedException());
+    when(() => mockRepository.getMe()).thenThrow(const UnauthenticatedException());
   });
 
   group('Test_LoginScreen', () {
@@ -48,8 +47,7 @@ void main() {
       expect(find.byType(LoginForm), findsOneWidget);
     });
 
-    testWidgets('shouldShowSnackBar_whenInvalidCredentialsExceptionOccurs',
-        (tester) async {
+    testWidgets('shouldShowSnackBar_whenInvalidCredentialsExceptionOccurs', (tester) async {
       // given
       when(
         () => mockRepository.authenticate(
@@ -84,8 +82,7 @@ void main() {
       expect(find.text('Invalid login ID or password.'), findsOneWidget);
     });
 
-    testWidgets('shouldShowSnackBar_whenAuthNetworkExceptionOccurs',
-        (tester) async {
+    testWidgets('shouldShowSnackBar_whenAuthNetworkExceptionOccurs', (tester) async {
       // given
       when(
         () => mockRepository.authenticate(

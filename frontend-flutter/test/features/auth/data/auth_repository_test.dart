@@ -69,8 +69,7 @@ void main() {
       );
     });
 
-    test('shouldThrowAuthNetworkException_whenOtherDioExceptionOccurs',
-        () async {
+    test('shouldThrowAuthNetworkException_whenOtherDioExceptionOccurs', () async {
       // given
       when(
         () => mockClient.authenticate(
@@ -91,8 +90,7 @@ void main() {
       );
     });
 
-    test('shouldThrowAuthNetworkException_whenNonDioExceptionOccurs',
-        () async {
+    test('shouldThrowAuthNetworkException_whenNonDioExceptionOccurs', () async {
       // given
       when(
         () => mockClient.authenticate(
@@ -142,8 +140,7 @@ void main() {
       );
     });
 
-    test('shouldThrowAuthNetworkException_whenOtherDioExceptionOccurs',
-        () async {
+    test('shouldThrowAuthNetworkException_whenOtherDioExceptionOccurs', () async {
       // given
       when(() => mockClient.getMe()).thenThrow(
         DioException(
@@ -159,11 +156,9 @@ void main() {
       );
     });
 
-    test('shouldThrowAuthNetworkException_whenNonDioExceptionOccurs',
-        () async {
+    test('shouldThrowAuthNetworkException_whenNonDioExceptionOccurs', () async {
       // given
-      when(() => mockClient.getMe())
-          .thenThrow(const FormatException('invalid json'));
+      when(() => mockClient.getMe()).thenThrow(const FormatException('invalid json'));
 
       // when & then
       await expectLater(
@@ -198,11 +193,9 @@ void main() {
       );
     });
 
-    test('shouldThrowAuthNetworkException_whenNonDioExceptionOccurs',
-        () async {
+    test('shouldThrowAuthNetworkException_whenNonDioExceptionOccurs', () async {
       // given
-      when(() => mockClient.logout())
-          .thenThrow(const FormatException('invalid json'));
+      when(() => mockClient.logout()).thenThrow(const FormatException('invalid json'));
 
       // when & then
       await expectLater(

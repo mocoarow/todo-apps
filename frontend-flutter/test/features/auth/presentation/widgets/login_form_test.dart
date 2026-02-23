@@ -15,8 +15,7 @@ void main() {
 
   setUp(() {
     mockRepository = MockAuthRepository();
-    when(() => mockRepository.getMe())
-        .thenThrow(const UnauthenticatedException());
+    when(() => mockRepository.getMe()).thenThrow(const UnauthenticatedException());
   });
 
   group('Test_LoginForm_validation', () {
@@ -38,8 +37,7 @@ void main() {
       expect(find.text('Login ID is required'), findsOneWidget);
     });
 
-    testWidgets('shouldShowError_whenLoginIdExceeds100Characters',
-        (tester) async {
+    testWidgets('shouldShowError_whenLoginIdExceeds100Characters', (tester) async {
       // given
       await tester.pumpApp(
         Scaffold(body: const LoginForm(isLoading: false)),

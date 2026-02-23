@@ -1,3 +1,4 @@
+---
 swagger_parser:
   schema_path: ../openapi/openapi.yaml
   output_directory: lib/api

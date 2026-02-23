@@ -41,8 +41,7 @@ void main() {
 
     test('shouldReturnNull_whenUnauthenticatedExceptionIsThrown', () async {
       // given
-      when(() => mockRepository.getMe())
-          .thenThrow(const UnauthenticatedException());
+      when(() => mockRepository.getMe()).thenThrow(const UnauthenticatedException());
       final container = createContainer();
 
       // when
@@ -57,8 +56,7 @@ void main() {
     test('shouldSetAsyncDataWithUser_whenLoginSucceeds', () async {
       // given
       const user = GetMeResponse(userId: 1, loginId: 'testuser');
-      when(() => mockRepository.getMe())
-          .thenThrow(const UnauthenticatedException());
+      when(() => mockRepository.getMe()).thenThrow(const UnauthenticatedException());
       when(
         () => mockRepository.authenticate(
           loginId: any(named: 'loginId'),
@@ -72,7 +70,9 @@ void main() {
       when(() => mockRepository.getMe()).thenAnswer((_) async => user);
 
       // when
-      await container.read(authControllerProvider.notifier).login(
+      await container
+          .read(authControllerProvider.notifier)
+          .login(
             loginId: 'testuser',
             password: 'password123',
           );
@@ -83,11 +83,9 @@ void main() {
       expect(state.value, user);
     });
 
-    test('shouldSetAsyncError_whenInvalidCredentialsExceptionIsThrown',
-        () async {
+    test('shouldSetAsyncError_whenInvalidCredentialsExceptionIsThrown', () async {
       // given
-      when(() => mockRepository.getMe())
-          .thenThrow(const UnauthenticatedException());
+      when(() => mockRepository.getMe()).thenThrow(const UnauthenticatedException());
       when(
         () => mockRepository.authenticate(
           loginId: any(named: 'loginId'),
@@ -98,7 +96,9 @@ void main() {
       await container.read(authControllerProvider.future);
 
       // when
-      await container.read(authControllerProvider.notifier).login(
+      await container
+          .read(authControllerProvider.notifier)
+          .login(
             loginId: 'testuser',
             password: 'wrongpass',
           );
@@ -132,8 +132,7 @@ void main() {
       // given
       const user = GetMeResponse(userId: 1, loginId: 'testuser');
       when(() => mockRepository.getMe()).thenAnswer((_) async => user);
-      when(() => mockRepository.logout())
-          .thenThrow(const AuthNetworkException());
+      when(() => mockRepository.logout()).thenThrow(const AuthNetworkException());
       final container = createContainer();
       await container.read(authControllerProvider.future);
 
