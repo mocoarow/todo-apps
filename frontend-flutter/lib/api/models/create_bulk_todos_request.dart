@@ -14,6 +14,6 @@ abstract class CreateBulkTodosRequest with _$CreateBulkTodosRequest {
   const factory CreateBulkTodosRequest({
     required List<CreateTodoRequest> todos,
   }) = _CreateBulkTodosRequest;
-  
+
   factory CreateBulkTodosRequest.fromJson(Map<String, Object?> json) => _$CreateBulkTodosRequestFromJson(json);
 }

@@ -14,6 +14,6 @@ abstract class AuthenticateResponse with _$AuthenticateResponse {
     /// JWT access token (omitted when delivered via cookie)
     String? accessToken,
   }) = _AuthenticateResponse;
-  
+
   factory AuthenticateResponse.fromJson(Map<String, Object?> json) => _$AuthenticateResponseFromJson(json);
 }

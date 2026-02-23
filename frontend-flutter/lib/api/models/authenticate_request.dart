@@ -13,6 +13,6 @@ abstract class AuthenticateRequest with _$AuthenticateRequest {
     required String loginId,
     required String password,
   }) = _AuthenticateRequest;
-  
+
   factory AuthenticateRequest.fromJson(Map<String, Object?> json) => _$AuthenticateRequestFromJson(json);
 }

@@ -16,6 +16,6 @@ abstract class CreateTodoResponse with _$CreateTodoResponse {
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _CreateTodoResponse;
-  
+
   factory CreateTodoResponse.fromJson(Map<String, Object?> json) => _$CreateTodoResponseFromJson(json);
 }

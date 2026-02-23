@@ -13,6 +13,6 @@ abstract class GetMeResponse with _$GetMeResponse {
     required int userId,
     required String loginId,
   }) = _GetMeResponse;
-  
+
   factory GetMeResponse.fromJson(Map<String, Object?> json) => _$GetMeResponseFromJson(json);
 }

@@ -13,6 +13,6 @@ abstract class UpdateTodoRequest with _$UpdateTodoRequest {
     required String text,
     required bool isComplete,
   }) = _UpdateTodoRequest;
-  
+
   factory UpdateTodoRequest.fromJson(Map<String, Object?> json) => _$UpdateTodoRequestFromJson(json);
 }

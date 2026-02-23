@@ -12,6 +12,6 @@ abstract class CreateTodoRequest with _$CreateTodoRequest {
   const factory CreateTodoRequest({
     required String text,
   }) = _CreateTodoRequest;
-  
+
   factory CreateTodoRequest.fromJson(Map<String, Object?> json) => _$CreateTodoRequestFromJson(json);
 }

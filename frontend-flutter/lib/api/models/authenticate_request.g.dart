@@ -6,11 +6,10 @@ part of 'authenticate_request.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_AuthenticateRequest _$AuthenticateRequestFromJson(Map<String, dynamic> json) =>
-    _AuthenticateRequest(
-      loginId: json['loginId'] as String,
-      password: json['password'] as String,
-    );
+_AuthenticateRequest _$AuthenticateRequestFromJson(Map<String, dynamic> json) => _AuthenticateRequest(
+  loginId: json['loginId'] as String,
+  password: json['password'] as String,
+);
 
 Map<String, dynamic> _$AuthenticateRequestToJson(
   _AuthenticateRequest instance,

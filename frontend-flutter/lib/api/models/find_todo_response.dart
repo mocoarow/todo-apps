@@ -14,6 +14,6 @@ abstract class FindTodoResponse with _$FindTodoResponse {
   const factory FindTodoResponse({
     required List<FindTodoResponseTodo> todos,
   }) = _FindTodoResponse;
-  
+
   factory FindTodoResponse.fromJson(Map<String, Object?> json) => _$FindTodoResponseFromJson(json);
 }

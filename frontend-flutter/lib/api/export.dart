@@ -21,4 +21,3 @@ export 'models/create_bulk_todos_request.dart';
 export 'models/x_token_delivery.dart';
 // Root client
 export 'todo_api_client.dart';
-

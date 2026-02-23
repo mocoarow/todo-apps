@@ -13,6 +13,6 @@ abstract class ErrorResponse with _$ErrorResponse {
     required String code,
     required String message,
   }) = _ErrorResponse;
-  
+
   factory ErrorResponse.fromJson(Map<String, Object?> json) => _$ErrorResponseFromJson(json);
 }

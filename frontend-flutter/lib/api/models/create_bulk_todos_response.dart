@@ -14,6 +14,6 @@ abstract class CreateBulkTodosResponse with _$CreateBulkTodosResponse {
   const factory CreateBulkTodosResponse({
     required List<CreateTodoResponse> todos,
   }) = _CreateBulkTodosResponse;
-  
+
   factory CreateBulkTodosResponse.fromJson(Map<String, Object?> json) => _$CreateBulkTodosResponseFromJson(json);
 }

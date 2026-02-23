@@ -16,6 +16,6 @@ abstract class FindTodoResponseTodo with _$FindTodoResponseTodo {
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _FindTodoResponseTodo;
-  
+
   factory FindTodoResponseTodo.fromJson(Map<String, Object?> json) => _$FindTodoResponseTodoFromJson(json);
 }
