@@ -79,7 +79,7 @@ tasks:
 
   # Code generation commands
   generate:
-    desc: "Run code generation"
+    desc: "Run code generation (build_runner only)"
     cmds:
       - dart run build_runner build --delete-conflicting-outputs
 
@@ -92,6 +92,13 @@ tasks:
     desc: "Clean and regenerate code"
     cmds:
       - dart run build_runner clean
+      - dart run build_runner build --delete-conflicting-outputs
+
+  # OpenAPI code generation commands
+  generate-openapi:
+    desc: "Generate API client and models from OpenAPI YAML"
+    cmds:
+      - dart run swagger_parser
       - dart run build_runner build --delete-conflicting-outputs
 
   # Help command

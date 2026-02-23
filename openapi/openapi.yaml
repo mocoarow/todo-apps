@@ -31,7 +31,7 @@ paths:
           schema:
             type: string
             enum: [json, cookie]
-            default: json
+            default: cookie
       requestBody:
         content:
           application/json:

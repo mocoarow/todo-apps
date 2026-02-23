@@ -1,0 +1,14 @@
+---
+swagger_parser:
+  schema_path: ../openapi/openapi.yaml
+  output_directory: lib/api
+  name: todo_api
+  language: dart
+  json_serializer: freezed
+  use_freezed3: true
+  default_content_type: "application/json"
+  root_client: true
+  root_client_name: TodoApiClient
+  export_file: true
+  client_postfix: Client
+  path_method_name: false
