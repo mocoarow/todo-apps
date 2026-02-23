@@ -9,6 +9,10 @@ import (
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/domain"
 )
 
+// expectedRegexpMatchLen is the expected length of FindStringSubmatch result:
+// [0] = full match, [1] = first capture group.
+const expectedRegexpMatchLen = 2
+
 // AuthTokenCreator creates a JWT token for authenticated users.
 type AuthTokenCreator interface {
 	CreateToken(loginID string, userID int) (string, error)
@@ -52,13 +56,13 @@ func (c *AuthenticateCommand) Execute(input *domain.AuthenticateInput) (*domain.
 
 func (c *AuthenticateCommand) authenticate(loginID string, password string) (int, error) {
 	userIDMatches := c.regexpUserID.FindStringSubmatch(loginID)
-	if len(userIDMatches) != 2 {
+	if len(userIDMatches) != expectedRegexpMatchLen {
 		return 0, errors.New("invalid login ID format")
 	}
 	userIDStr := userIDMatches[1]
 
 	passwordMatches := c.regexpPassword.FindStringSubmatch(password)
-	if len(passwordMatches) != 2 {
+	if len(passwordMatches) != expectedRegexpMatchLen {
 		return 0, errors.New("invalid password format")
 	}
 	passwordNum := passwordMatches[1]

@@ -56,9 +56,7 @@ func initAuthRouterWithMiddleware(t *testing.T, ctx context.Context, authUsecase
 	require.NoError(t, err)
 	api := router.Group("api")
 	v1 := api.Group("v1")
-
-	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, testCookieConfig, 60, authMiddleware)
-	initAuthRouterFunc(v1)
+	handler.InitAuthRouter(authUsecase, testCookieConfig, 60, v1, authMiddleware)
 
 	return router
 }
@@ -311,8 +309,7 @@ func Test_AuthHandler_Logout_shouldReturn500_whenCookieConfigIsNil(t *testing.T)
 	router, err := handler.InitRootRouterGroup(ctx, config, domain.AppName)
 	require.NoError(t, err)
 	v1 := router.Group("api").Group("v1")
-	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, nil, 60, noopMiddleware())
-	initAuthRouterFunc(v1)
+	handler.InitAuthRouter(authUsecase, nil, 60, v1, noopMiddleware())
 
 	w := httptest.NewRecorder()
 
@@ -340,8 +337,7 @@ func Test_AuthHandler_Authenticate_shouldReturn500_whenCookieConfigIsNilAndXToke
 	router, err := handler.InitRootRouterGroup(ctx, config, domain.AppName)
 	require.NoError(t, err)
 	v1 := router.Group("api").Group("v1")
-	initAuthRouterFunc := handler.NewInitAuthRouterFunc(authUsecase, nil, 60, noopMiddleware())
-	initAuthRouterFunc(v1)
+	handler.InitAuthRouter(authUsecase, nil, 60, v1, noopMiddleware())
 
 	w := httptest.NewRecorder()
 	body := `{"loginId":"user1","password":"password1"}`

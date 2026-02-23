@@ -12,10 +12,10 @@ const (
 )
 
 var (
-	v = validator.New()
+	v = validator.New() //nolint:gochecknoglobals
 )
 
 // ValidateStruct validates the given struct using the go-playground/validator tags.
-func ValidateStruct(s interface{}) error {
+func ValidateStruct(s any) error {
 	return v.Struct(s) //nolint:wrapcheck
 }

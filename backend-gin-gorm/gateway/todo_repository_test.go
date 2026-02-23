@@ -17,14 +17,6 @@ const (
 	timeMargin = 2 * time.Second // Margin for timestamp comparison
 )
 
-// cleanupTodoTable deletes all entries in the todo table for a specific user.
-func cleanupTodoTable(t *testing.T, userID int) {
-	t.Helper()
-	if err := db.Exec("DELETE FROM todo WHERE user_id = ?", userID).Error; err != nil {
-		t.Fatalf("Failed to delete from table todo: %v", err)
-	}
-}
-
 // FindTodos Tests
 
 func TestTodoRepository_FindTodos_shouldReturnEmptyList_whenNoTodosExist(t *testing.T) {
@@ -34,7 +26,7 @@ func TestTodoRepository_FindTodos_shouldReturnEmptyList_whenNoTodosExist(t *test
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// when
 	todos, err := repo.FindTodos(ctx, userID)
@@ -51,7 +43,7 @@ func TestTodoRepository_FindTodos_shouldReturnSingleTodo_whenOneTodoExists(t *te
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// - Insert test data
 	input, err := domain.NewCreateTodoInput(userID, "Test Todo")
@@ -74,7 +66,7 @@ func TestTodoRepository_FindTodos_shouldReturnMultipleTodos_whenMultipleTodosExi
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// - Insert test data
 	texts := []string{
@@ -104,7 +96,7 @@ func TestTodoRepository_FindTodos_shouldReturnTodosInInsertionOrder_whenMultiple
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// - Insert test data
 	texts := []string{
@@ -138,7 +130,7 @@ func TestTodoRepository_CreateTodo_shouldReturnValidTodo_whenTodoCreated(t *test
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// when
 	text := "New Todo Item"
@@ -168,7 +160,7 @@ func TestTodoRepository_CreateTodo_shouldPersistTodoInDatabase_whenTodoCreated(t
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// when
 	text := "Persisted Todo"
@@ -198,7 +190,7 @@ func TestTodoRepository_UpdateTodo_shouldUpdateTextAndIsComplete_whenValidInputP
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// - Create a todo first
 	createInput, err := domain.NewCreateTodoInput(userID, "Original Text")
@@ -229,7 +221,7 @@ func TestTodoRepository_UpdateTodo_shouldPersistChangesInDatabase_whenTodoUpdate
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// - Create a todo first
 	createInput, err := domain.NewCreateTodoInput(userID, "Original Text")
@@ -261,7 +253,7 @@ func TestTodoRepository_UpdateTodo_shouldReturnError_whenTodoNotFound(t *testing
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// when - Try to update a non-existent todo
 	nonExistentID := 999999999
@@ -282,7 +274,7 @@ func TestTodoRepository_UpdateTodo_shouldReturnError_whenUserIDDoesNotMatch(t *t
 	// given
 	cleanupTodoTable(t, userID)
 	cleanupTodoTable(t, differentUserID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// Create a todo for userID
 	createInput, err := domain.NewCreateTodoInput(userID, "Original Text")
@@ -315,7 +307,7 @@ func TestTodoRepository_DeleteTodo_shouldDeleteTodo_whenValidInputProvided(t *te
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// Create a todo first
 	createInput, err := domain.NewCreateTodoInput(userID, "Todo to delete")
@@ -342,7 +334,7 @@ func TestTodoRepository_DeleteTodo_shouldNotAffectOtherTodos_whenOneTodoDeleted(
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// Create multiple todos
 	todo1Input, err := domain.NewCreateTodoInput(userID, "Todo 1")
@@ -376,7 +368,7 @@ func TestTodoRepository_DeleteTodo_shouldReturnError_whenTodoNotFound(t *testing
 
 	// given
 	cleanupTodoTable(t, userID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// when - Try to delete a non-existent todo
 	nonExistentID := 999999999
@@ -397,7 +389,7 @@ func TestTodoRepository_DeleteTodo_shouldReturnError_whenUserIDDoesNotMatch(t *t
 	// given
 	cleanupTodoTable(t, userID)
 	cleanupTodoTable(t, differentUserID)
-	repo := gateway.NewTodoRepository(db)
+	repo := gateway.NewTodoRepository(dbc.DB)
 
 	// Create a todo for userID
 	createInput, err := domain.NewCreateTodoInput(userID, "Todo to protect")

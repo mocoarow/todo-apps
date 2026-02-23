@@ -58,23 +58,26 @@ func InitLog(ctx context.Context, logConfig *LogConfig, appName string) (func(),
 	return InitLogProvider(ctx, logConfig, appName)
 }
 
-const logShutdownTimeout = 5 * time.Second
+const (
+	logShutdownTimeout = 5 * time.Second
+	logMaxQueueSize    = 10_000
+	logExportMaxBatch  = 10_000
+	logExportInterval  = 10 * time.Second
+	logExportTimeout   = 10 * time.Second
+)
 
 // InitLogExporterFunc is a function type that creates a log exporter from config.
 type InitLogExporterFunc func(ctx context.Context, logConfig *LogConfig) (sdklog.Exporter, error)
 
-func initLogExporter(ctx context.Context, logConfig *LogConfig) (sdklog.Exporter, error) {
-	initLogExporters := map[string]InitLogExporterFunc{
-		"otlphttp":    initLogExporterOTLPHTTP,
-		"uptracehttp": initLogExporterUptraceHTTP,
-	}
-
-	initLogExporter, ok := initLogExporters[logConfig.Exporter]
-	if !ok {
+func initLogExporter(ctx context.Context, logConfig *LogConfig) (sdklog.Exporter, error) { //nolint:ireturn
+	switch logConfig.Exporter {
+	case "otlphttp":
+		return initLogExporterOTLPHTTP(ctx, logConfig)
+	case "uptracehttp":
+		return initLogExporterUptraceHTTP(ctx, logConfig)
+	default:
 		return nil, fmt.Errorf("invalid log exporter: %s", logConfig.Exporter)
 	}
-
-	return initLogExporter(ctx, logConfig)
 }
 
 // InitLogProvider creates an OpenTelemetry log provider with batch processing
@@ -86,10 +89,10 @@ func InitLogProvider(ctx context.Context, logConfig *LogConfig, appName string) 
 	}
 
 	bp := sdklog.NewBatchProcessor(exp,
-		sdklog.WithMaxQueueSize(10_000),
-		sdklog.WithExportMaxBatchSize(10_000),
-		sdklog.WithExportInterval(10*time.Second),
-		sdklog.WithExportTimeout(10*time.Second),
+		sdklog.WithMaxQueueSize(logMaxQueueSize),
+		sdklog.WithExportMaxBatchSize(logExportMaxBatch),
+		sdklog.WithExportInterval(logExportInterval),
+		sdklog.WithExportTimeout(logExportTimeout),
 	)
 
 	lp := sdklog.NewLoggerProvider(

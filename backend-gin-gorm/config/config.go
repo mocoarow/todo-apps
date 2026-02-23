@@ -43,7 +43,7 @@ var config embed.FS
 func ExpandEnvWithDefaults(varName string) string {
 	// Check if it contains :-
 	if strings.Contains(varName, ":-") {
-		parts := strings.SplitN(varName, ":-", 2)
+		parts := strings.SplitN(varName, ":-", 2) //nolint:mnd // split into name and default
 		name := parts[0]
 		defaultValue := parts[1]
 

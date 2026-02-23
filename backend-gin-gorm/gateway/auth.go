@@ -99,7 +99,7 @@ func (m *AuthTokenManager) createJWT(loginID string, userID int, duration time.D
 }
 
 func (m *AuthTokenManager) parseToken(tokenString string) (*userClaims, error) {
-	keyFunc := func(token *jwt.Token) (interface{}, error) {
+	keyFunc := func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
