@@ -22,7 +22,7 @@ void main() {
     testWidgets('shouldShowError_whenLoginIdIsEmpty', (tester) async {
       // given
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: false)),
+        const Scaffold(body: LoginForm(isLoading: false)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
@@ -40,7 +40,7 @@ void main() {
     testWidgets('shouldShowError_whenLoginIdExceeds100Characters', (tester) async {
       // given
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: false)),
+        const Scaffold(body: LoginForm(isLoading: false)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
@@ -65,7 +65,7 @@ void main() {
     testWidgets('shouldShowError_whenPasswordIsEmpty', (tester) async {
       // given
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: false)),
+        const Scaffold(body: LoginForm(isLoading: false)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
@@ -84,7 +84,7 @@ void main() {
     testWidgets('shouldShowError_whenPasswordIsTooShort', (tester) async {
       // given
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: false)),
+        const Scaffold(body: LoginForm(isLoading: false)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
@@ -106,7 +106,7 @@ void main() {
     testWidgets('shouldShowError_whenPasswordIsTooLong', (tester) async {
       // given
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: false)),
+        const Scaffold(body: LoginForm(isLoading: false)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
@@ -143,7 +143,7 @@ void main() {
       );
 
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: false)),
+        const Scaffold(body: LoginForm(isLoading: false)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
@@ -178,7 +178,7 @@ void main() {
     testWidgets('shouldDisableButton_whenIsLoading', (tester) async {
       // given & when
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: true)),
+        const Scaffold(body: LoginForm(isLoading: true)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
@@ -193,7 +193,7 @@ void main() {
     testWidgets('shouldShowProgressIndicator_whenIsLoading', (tester) async {
       // given & when
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: true)),
+        const Scaffold(body: LoginForm(isLoading: true)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
@@ -210,7 +210,7 @@ void main() {
     testWidgets('shouldTogglePasswordVisibility', (tester) async {
       // given
       await tester.pumpApp(
-        Scaffold(body: const LoginForm(isLoading: false)),
+        const Scaffold(body: LoginForm(isLoading: false)),
         overrides: [
           authRepositoryProvider.overrideWithValue(mockRepository),
         ],
