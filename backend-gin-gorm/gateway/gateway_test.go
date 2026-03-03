@@ -8,25 +8,23 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"gorm.io/gorm"
 
 	"github.com/mocoarow/todo-apps/backend-gin-gorm/gateway"
 )
 
-var db *gorm.DB
+var dbc *gateway.DBConnection
 
 func TestMain(m *testing.M) {
 	_ = godotenv.Load("../.env.test")
 
-	tmpdb, err := OpenTestMySQL()
+	tmpdbc, err := openTestMySQL()
 	if err != nil {
 		slog.Error("failed to open test MySQL", slog.Any("error", err))
 		os.Exit(1)
 	}
 
-	db = tmpdb
+	dbc = tmpdbc
 
-	// run tests
 	code := m.Run()
 
 	os.Exit(code)
@@ -39,8 +37,7 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
-// SetupTestDB sets up a test database connection and runs migrations
-func OpenTestMySQL() (*gorm.DB, error) {
+func openTestMySQL() (*gateway.DBConnection, error) {
 	host := getEnv("TEST_MYSQL_HOST", "127.0.0.1")
 	portStr := getEnv("TEST_MYSQL_PORT", "3307")
 	port, err := strconv.Atoi(portStr)
@@ -67,5 +64,12 @@ func OpenTestMySQL() (*gorm.DB, error) {
 		return nil, fmt.Errorf("open test MySQL: %w", err)
 	}
 
-	return db, nil
+	return &gateway.DBConnection{DriverName: "mysql", DB: db}, nil
+}
+
+func cleanupTodoTable(t *testing.T, userID int) {
+	t.Helper()
+	if err := dbc.DB.Exec("DELETE FROM todo WHERE user_id = ?", userID).Error; err != nil {
+		t.Fatalf("Failed to delete from table todo: %v", err)
+	}
 }

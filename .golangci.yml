@@ -18,25 +18,37 @@ linters:
     - durationcheck
     - errname
     - errorlint
+    - errchkjson
+    - errcheck
     - exhaustive
     - exhaustruct
     - exptostd
     - fatcontext
     - forbidigo
     - forcetypeassert
+    - gocritic
     - gocheckcompilerdirectives
+    - gochecknoglobals
     - gocognit
     - goconst
     - gocritic
     - gocyclo
     - goheader
     - gosec
+    - iface
     - importas
+    - intrange
+    - interfacebloat
+    - ireturn
     - makezero
     - mirror
     - misspell
+    - mnd
+    - modernize
+    - musttag
     - nestif
     - nilerr
+    - nilnesserr
     - nilnil
     - noctx
     - nolintlint
@@ -47,6 +59,7 @@ linters:
     - reassign
     - revive
     - rowserrcheck
+    - sloglint
     - spancheck
     - sqlclosecheck
     - staticcheck
@@ -58,7 +71,6 @@ linters:
     - whitespace
     - wrapcheck
     - wsl_v5
-
   settings:
     forbidigo:
       forbid:
@@ -78,21 +90,15 @@ linters:
         - errors.Errorf(
         - .Errorf(
         - .Errorf
-        - liberrors.Errorf(
       ignore-sigs:
         - errors.Errorf(
         - .Errorf(
         - .Errorf
         - errors.New(
-        - liberrors.Errorf(
     wsl_v5:
-      allow-first-in-block: true
-      allow-whole-block: false
-      branch-max-lines: 2
       disable:
         - if
         - expr
-        - switch
         - append
         - range
         - assign
@@ -120,6 +126,7 @@ linters:
           - exhaustruct
           - wrapcheck
           - goconst
+          - gochecknoglobals
 formatters:
   enable:
     - gofmt

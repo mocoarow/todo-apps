@@ -47,6 +47,11 @@ func openTestMySQL() (*gateway.DBConnection, error) {
 	user := getEnv("TEST_MYSQL_USERNAME", "username")
 	password := getEnv("TEST_MYSQL_PASSWORD", "password")
 	database := getEnv("TEST_MYSQL_DATABASE", "test")
+	logLevelStr := getEnv("TEST_LOG_LEVEL", "INFO")
+	logLevel := slog.LevelInfo
+	if logLevelStr == "DEBUG" {
+		logLevel = slog.LevelDebug
+	}
 
 	db, err := gateway.OpenMySQL(&gateway.MySQLConfig{
 		Username: user,
@@ -54,7 +59,7 @@ func openTestMySQL() (*gateway.DBConnection, error) {
 		Host:     host,
 		Port:     port,
 		Database: database,
-	}, slog.LevelInfo, "test")
+	}, logLevel, "test")
 	if err != nil {
 		return nil, fmt.Errorf("open test MySQL: %w", err)
 	}
@@ -62,6 +67,7 @@ func openTestMySQL() (*gateway.DBConnection, error) {
 	return &gateway.DBConnection{DriverName: "mysql", DB: db}, nil
 }
 
+// cleanupTodoTable deletes all entries in the todo table for a specific user.
 func cleanupTodoTable(t *testing.T, userID int) {
 	t.Helper()
 	if err := dbc.DB.Exec("DELETE FROM todo WHERE user_id = ?", userID).Error; err != nil {

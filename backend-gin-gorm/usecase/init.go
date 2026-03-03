@@ -8,5 +8,5 @@ import (
 )
 
 var (
-	tracer = otel.Tracer("github.com/mocoarow/todo-apps/backend-gin-gorm/usecase")
+	tracer = otel.Tracer("github.com/mocoarow/todo-apps/backend-gin-gorm/usecase") //nolint:gochecknoglobals
 )

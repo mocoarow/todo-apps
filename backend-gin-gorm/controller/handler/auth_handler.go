@@ -134,15 +134,12 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// NewInitAuthRouterFunc returns an InitRouterGroupFunc that registers auth routes under an "auth" group.
-// authMiddleware is applied only to routes that require authentication (e.g. /me).
-func NewInitAuthRouterFunc(authUsecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int, authMiddleware gin.HandlerFunc) InitRouterGroupFunc {
-	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) {
-		auth := parentRouterGroup.Group("auth", middleware...)
-		authHandler := NewAuthHandler(authUsecase, cookieConfig, tokenTTLMin)
+// InitAuthRouter sets up the routes for auth operations under the given parent router group.
+func InitAuthRouter(authUsecase AuthUsecase, cookieConfig *controller.CookieConfig, tokenTTLMin int, parentRouterGroup gin.IRouter, authMiddleware gin.HandlerFunc, middleware ...gin.HandlerFunc) {
+	auth := parentRouterGroup.Group("auth", middleware...)
+	authHandler := NewAuthHandler(authUsecase, cookieConfig, tokenTTLMin)
 
-		auth.POST("/authenticate", authHandler.Authenticate)
-		auth.POST("/logout", authHandler.Logout)
-		auth.GET("/me", authMiddleware, authHandler.GetMe)
-	}
+	auth.POST("/authenticate", authHandler.Authenticate)
+	auth.POST("/logout", authHandler.Logout)
+	auth.GET("/me", authMiddleware, authHandler.GetMe)
 }

@@ -12,7 +12,7 @@ var ErrUnauthenticated = errors.New("unauthenticated")
 // AuthenticateInput holds the login credentials for authentication.
 type AuthenticateInput struct {
 	LoginID  string `validate:"required"`
-	Password string `validate:"required"`
+	Password string `validate:"required"` //nolint:gosec
 }
 
 // NewAuthenticateInput creates a validated AuthenticateInput.
@@ -29,7 +29,7 @@ func NewAuthenticateInput(loginID string, password string) (*AuthenticateInput, 
 
 // AuthenticateOutput holds the access token returned after successful authentication.
 type AuthenticateOutput struct {
-	AccessToken string `validate:"required"`
+	AccessToken string `validate:"required"` //nolint:gosec
 }
 
 // NewAuthenticateOutput creates a validated AuthenticateOutput.

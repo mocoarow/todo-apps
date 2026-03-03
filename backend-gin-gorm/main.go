@@ -65,12 +65,10 @@ func run() (int, error) {
 		todoRepo := gateway.NewTodoRepository(dbc.DB)
 		todoCreateBulkCommandTxManager := gateway.NewTodoCreateBulkCommandTxManager(dbc)
 		todoUsecase := usecase.NewTodoUsecase(todoRepo, todoCreateBulkCommandTxManager)
-		funcs := handler.NewInitTodoRouterFunc(todoUsecase)
-		funcs(v1, authMiddleware)
+		handler.InitTodoRouter(todoUsecase, v1, authMiddleware)
 	}
 	{
-		funcs := handler.NewInitAuthRouterFunc(authUsecase, cfg.Auth.Cookie, cfg.Auth.AccessTokenTTLMin, authMiddleware)
-		funcs(v1)
+		handler.InitAuthRouter(authUsecase, cfg.Auth.Cookie, cfg.Auth.AccessTokenTTLMin, v1, authMiddleware)
 	}
 
 	// run

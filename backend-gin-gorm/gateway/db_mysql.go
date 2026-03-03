@@ -33,13 +33,13 @@ func (d *DialectMySQL) BoolDefaultValue() string {
 // MySQLConfig holds MySQL connection parameters.
 type MySQLConfig struct {
 	Username string `yaml:"username" validate:"required"`
-	Password string `yaml:"password" validate:"required"`
+	Password string `yaml:"password" validate:"required"` //nolint:gosec
 	Host     string `yaml:"host" validate:"required"`
 	Port     int    `yaml:"port" validate:"required"`
 	Database string `yaml:"database" validate:"required"`
 }
 
-func initDBMySQL(ctx context.Context, cfg *DBConfig, logLevel slog.Level, appName string) (DialectRDBMS, *gorm.DB, *sql.DB, error) {
+func initDBMySQL(ctx context.Context, cfg *DBConfig, logLevel slog.Level, appName string) (*DialectMySQL, *gorm.DB, *sql.DB, error) {
 	db, err := OpenMySQL(cfg.MySQL, logLevel, appName)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("OpenMySQL: %w", err)
@@ -99,7 +99,7 @@ func OpenMySQL(cfg *MySQLConfig, logLevel slog.Level, appName string) (*gorm.DB,
 		Collation:            "utf8mb4_bin",
 		AllowNativePasswords: true,
 		CheckConnLiveness:    true,
-		MaxAllowedPacket:     64 << 20, // 64 MiB.
+		MaxAllowedPacket:     64 << 20, //nolint:mnd // 64 MiB.
 		Loc:                  time.UTC,
 	}
 

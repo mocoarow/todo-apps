@@ -26,11 +26,8 @@ func initTodoRouter(t *testing.T, ctx context.Context, todoUsecase handler.TodoU
 	require.NoError(t, err)
 	api := router.Group("api")
 	v1 := api.Group("v1")
-
 	v1.Use(mockAuthMiddleware(userID))
-
-	initTodoRouterFunc := handler.NewInitTodoRouterFunc(todoUsecase)
-	initTodoRouterFunc(v1)
+	handler.InitTodoRouter(todoUsecase, v1)
 
 	return router
 }

@@ -15,7 +15,7 @@ type CookieConfig struct {
 
 // SetTokenCookie writes an access-token cookie to the response with the configured attributes.
 func (c *CookieConfig) SetTokenCookie(w http.ResponseWriter, token string, tokenTTLMin int) {
-	maxAge := tokenTTLMin * 60
+	maxAge := tokenTTLMin * 60      //nolint:mnd // seconds per minute
 	http.SetCookie(w, &http.Cookie{ //nolint:exhaustruct
 		Name:     c.Name,
 		Value:    token,

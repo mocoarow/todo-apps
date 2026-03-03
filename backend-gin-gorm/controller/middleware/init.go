@@ -6,5 +6,5 @@ import (
 )
 
 var (
-	tracer = otel.Tracer("github.com/mocoarow/todo-apps/backend-gin-gorm/controller/middleware")
+	tracer = otel.Tracer("github.com/mocoarow/todo-apps/backend-gin-gorm/controller/middleware") //nolint:gochecknoglobals
 )

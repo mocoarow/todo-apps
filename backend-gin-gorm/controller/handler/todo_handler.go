@@ -32,16 +32,14 @@ func NewTodoHandler(usecase TodoUsecase) *TodoHandler {
 	}
 }
 
-// NewInitTodoRouterFunc returns an InitRouterGroupFunc that registers todo routes under a "todo" group.
-func NewInitTodoRouterFunc(todoUsecase TodoUsecase) InitRouterGroupFunc {
-	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) {
-		todo := parentRouterGroup.Group("todo", middleware...)
-		todoHandler := NewTodoHandler(todoUsecase)
+// InitTodoRouter sets up the routes for todo operations under the given parent router group.
+func InitTodoRouter(todoUsecase TodoUsecase, parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) {
+	todo := parentRouterGroup.Group("todo", middleware...)
+	todoHandler := NewTodoHandler(todoUsecase)
 
-		todo.POST("", todoHandler.CreateTodo)
-		todo.POST("/bulk", todoHandler.CreateBulkTodos)
-		todo.GET("", todoHandler.FindTodos)
-		todo.PUT("/:id", todoHandler.UpdateTodo)
-		todo.DELETE("/:id", todoHandler.DeleteTodo)
-	}
+	todo.POST("", todoHandler.CreateTodo)
+	todo.POST("/bulk", todoHandler.CreateBulkTodos)
+	todo.GET("", todoHandler.FindTodos)
+	todo.PUT("/:id", todoHandler.UpdateTodo)
+	todo.DELETE("/:id", todoHandler.DeleteTodo)
 }

@@ -11,6 +11,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	DriverNameMySQL = "mysql"
+)
+
 // DBConfig holds the database driver name and driver-specific configuration.
 type DBConfig struct {
 	DriverName string       `yaml:"driverName"`
@@ -27,23 +31,24 @@ type DBConnection struct {
 // InitDBFunc is a function type that initializes a database connection for a specific driver.
 type InitDBFunc func(context.Context, *DBConfig, slog.Level, string) (DialectRDBMS, *gorm.DB, *sql.DB, error)
 
+func initDB(ctx context.Context, dbConfig *DBConfig, logLevel slog.Level, appName string) (DialectRDBMS, *gorm.DB, *sql.DB, error) { //nolint:ireturn
+	switch dbConfig.DriverName {
+	case DriverNameMySQL:
+		return initDBMySQL(ctx, dbConfig, logLevel, appName)
+	default:
+		return nil, nil, nil, fmt.Errorf("invalid database driver: %s", dbConfig.DriverName)
+	}
+}
+
 // InitDB initializes a database connection based on the configured driver.
 // It returns the connection and a cleanup function to close the underlying sql.DB.
 func InitDB(ctx context.Context, dbConfig *DBConfig, logConfig *LogConfig, appName string) (*DBConnection, func(), error) {
-	initDBs := map[string]InitDBFunc{
-		"mysql": initDBMySQL,
-	}
-
-	initDBFunc, ok := initDBs[dbConfig.DriverName]
-	if !ok {
-		return nil, nil, fmt.Errorf("invalid database driver: %s", dbConfig.DriverName)
-	}
 	dbLogLevel := slog.LevelWarn
 	if level, ok := logConfig.Levels["db"]; ok {
 		dbLogLevel = stringToLogLevel(level)
 	}
 
-	dialect, db, sqlDB, err := initDBFunc(ctx, dbConfig, dbLogLevel, appName)
+	dialect, db, sqlDB, err := initDB(ctx, dbConfig, dbLogLevel, appName)
 	if err != nil {
 		return nil, nil, fmt.Errorf("init DB: %w", err)
 	}
