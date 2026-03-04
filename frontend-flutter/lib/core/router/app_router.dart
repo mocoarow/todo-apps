@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:todo/api/models/get_me_response.dart';
 import 'package:todo/features/auth/presentation/auth_controller.dart';
 import 'package:todo/features/auth/presentation/login_screen.dart';
+import 'package:todo/features/todo/presentation/todo_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -47,7 +48,7 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: '/',
-        builder: (context, state) => const _HomeScreenPlaceholder(),
+        builder: (context, state) => const TodoScreen(),
       ),
     ],
   );
@@ -60,18 +61,6 @@ class _SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(child: CircularProgressIndicator()),
-    );
-  }
-}
-
-class _HomeScreenPlaceholder extends StatelessWidget {
-  const _HomeScreenPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: const Center(child: Text('Welcome!')),
     );
   }
 }
