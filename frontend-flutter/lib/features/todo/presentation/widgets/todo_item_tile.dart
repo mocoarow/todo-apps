@@ -4,18 +4,22 @@ import 'package:todo/api/models/find_todo_response_todo.dart';
 import 'package:todo/features/todo/presentation/todo_controller.dart';
 
 class TodoItemTile extends ConsumerWidget {
-  const TodoItemTile({required this.todo, super.key});
+  const TodoItemTile({required this.todo, this.onTitleTap, super.key});
 
   final FindTodoResponseTodo todo;
+  final VoidCallback? onTitleTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return CheckboxListTile(
       value: todo.isComplete,
       onChanged: (_) => ref.read(todoControllerProvider.notifier).toggleComplete(todo),
-      title: Text(
-        todo.text,
-        style: todo.isComplete ? const TextStyle(decoration: TextDecoration.lineThrough) : null,
+      title: GestureDetector(
+        onTap: onTitleTap,
+        child: Text(
+          todo.text,
+          style: todo.isComplete ? const TextStyle(decoration: TextDecoration.lineThrough) : null,
+        ),
       ),
     );
   }

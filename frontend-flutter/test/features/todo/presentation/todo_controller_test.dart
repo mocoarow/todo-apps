@@ -102,4 +102,93 @@ void main() {
       expect(state.value, todos);
     });
   });
+
+  group('Test_TodoController_updateTitle', () {
+    test('shouldRefetchTodos_whenUpdateTitleSucceeds', () async {
+      // given
+      when(() => mockRepository.fetchTodos()).thenAnswer((_) async => todos);
+      when(
+        () => mockRepository.updateTodo(
+          id: any(named: 'id'),
+          body: any(named: 'body'),
+        ),
+      ).thenAnswer((_) async {});
+      final container = createContainer();
+      await container.read(todoControllerProvider.future);
+
+      // when
+      await container.read(todoControllerProvider.notifier).updateTitle(todos[0], 'Buy eggs');
+
+      // then
+      final state = container.read(todoControllerProvider);
+      expect(state, isA<AsyncData<List<FindTodoResponseTodo>>>());
+      verify(
+        () => mockRepository.updateTodo(
+          id: 1,
+          body: const UpdateTodoRequest(text: 'Buy eggs', isComplete: false),
+        ),
+      ).called(1);
+    });
+
+    test('shouldRevertToOriginalData_whenUpdateTitleFails', () async {
+      // given
+      when(() => mockRepository.fetchTodos()).thenAnswer((_) async => todos);
+      when(
+        () => mockRepository.updateTodo(
+          id: any(named: 'id'),
+          body: any(named: 'body'),
+        ),
+      ).thenThrow(const TodoNetworkException());
+      final container = createContainer();
+      await container.read(todoControllerProvider.future);
+
+      // when
+      await container.read(todoControllerProvider.notifier).updateTitle(todos[0], 'Buy eggs');
+
+      // then — state is reverted to original data (not AsyncError)
+      final state = container.read(todoControllerProvider);
+      expect(state, isA<AsyncData<List<FindTodoResponseTodo>>>());
+      expect(state.value, todos);
+    });
+  });
+
+  group('Test_TodoController_addTodo', () {
+    test('shouldRefetchTodos_whenAddSucceeds', () async {
+      // given
+      when(() => mockRepository.fetchTodos()).thenAnswer((_) async => todos);
+      when(
+        () => mockRepository.createTodo(text: any(named: 'text')),
+      ).thenAnswer((_) async {});
+      final container = createContainer();
+      await container.read(todoControllerProvider.future);
+
+      // when
+      await container.read(todoControllerProvider.notifier).addTodo('New todo');
+
+      // then
+      final state = container.read(todoControllerProvider);
+      expect(state, isA<AsyncData<List<FindTodoResponseTodo>>>());
+      verify(() => mockRepository.createTodo(text: 'New todo')).called(1);
+      // fetchTodos called twice: once in build, once after addTodo
+      verify(() => mockRepository.fetchTodos()).called(2);
+    });
+
+    test('shouldTransitionToErrorThenRevert_whenAddFails', () async {
+      // given
+      when(() => mockRepository.fetchTodos()).thenAnswer((_) async => todos);
+      when(
+        () => mockRepository.createTodo(text: any(named: 'text')),
+      ).thenThrow(const TodoNetworkException());
+      final container = createContainer();
+      await container.read(todoControllerProvider.future);
+
+      // when
+      await container.read(todoControllerProvider.notifier).addTodo('New todo');
+
+      // then — state is reverted to original data
+      final state = container.read(todoControllerProvider);
+      expect(state, isA<AsyncData<List<FindTodoResponseTodo>>>());
+      expect(state.value, todos);
+    });
+  });
 }
