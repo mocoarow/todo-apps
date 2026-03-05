@@ -44,4 +44,48 @@ class TodoController extends _$TodoController {
       state = AsyncData(previousData);
     }
   }
+
+  Future<void> updateTitle(FindTodoResponseTodo todo, String newText) async {
+    final previousData = state.value;
+    if (previousData != null) {
+      state = AsyncData(
+        previousData.map((t) {
+          if (t.id == todo.id) {
+            return t.copyWith(text: newText);
+          }
+          return t;
+        }).toList(),
+      );
+    }
+
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(todoRepositoryProvider);
+      await repository.updateTodo(
+        id: todo.id,
+        body: UpdateTodoRequest(
+          text: newText,
+          isComplete: todo.isComplete,
+        ),
+      );
+      return repository.fetchTodos();
+    });
+
+    if (state.hasError && previousData != null) {
+      state = AsyncData(previousData);
+    }
+  }
+
+  Future<void> addTodo(String text) async {
+    final previousData = state.value;
+
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(todoRepositoryProvider);
+      await repository.createTodo(text: text);
+      return repository.fetchTodos();
+    });
+
+    if (state.hasError && previousData != null) {
+      state = AsyncData(previousData);
+    }
+  }
 }

@@ -32,7 +32,7 @@ final class TodoControllerProvider extends $AsyncNotifierProvider<TodoController
   TodoController create() => TodoController();
 }
 
-String _$todoControllerHash() => r'b1f607b18f7e2588465210c676c6d6a18e543dd1';
+String _$todoControllerHash() => r'e7667d8a1121a31763e3e2c92521bff3b7908df0';
 
 abstract class _$TodoController extends $AsyncNotifier<List<FindTodoResponseTodo>> {
   FutureOr<List<FindTodoResponseTodo>> build();

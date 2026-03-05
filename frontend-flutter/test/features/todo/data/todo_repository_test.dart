@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:todo/api/models/create_todo_request.dart';
+import 'package:todo/api/models/create_todo_response.dart';
 import 'package:todo/api/models/find_todo_response.dart';
 import 'package:todo/api/models/find_todo_response_todo.dart';
 import 'package:todo/api/models/update_todo_request.dart';
@@ -18,6 +20,9 @@ void main() {
   setUpAll(() {
     registerFallbackValue(
       const UpdateTodoRequest(text: '', isComplete: false),
+    );
+    registerFallbackValue(
+      const CreateTodoRequest(text: ''),
     );
   });
 
@@ -68,6 +73,66 @@ void main() {
       // when & then
       await expectLater(
         repository.fetchTodos(),
+        throwsA(isA<TodoNetworkException>()),
+      );
+    });
+  });
+
+  group('Test_TodoRepository_createTodo', () {
+    test('shouldComplete_whenRequestSucceeds', () async {
+      // given
+      final now = DateTime.now();
+      when(
+        () => mockClient.createTodo(body: any(named: 'body')),
+      ).thenAnswer(
+        (_) async => CreateTodoResponse(
+          id: 3,
+          text: 'New todo',
+          isComplete: false,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
+
+      // when & then
+      await expectLater(
+        repository.createTodo(text: 'New todo'),
+        completes,
+      );
+      verify(
+        () => mockClient.createTodo(
+          body: const CreateTodoRequest(text: 'New todo'),
+        ),
+      ).called(1);
+    });
+
+    test('shouldThrowTodoNetworkException_whenDioExceptionOccurs', () async {
+      // given
+      when(
+        () => mockClient.createTodo(body: any(named: 'body')),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionTimeout,
+        ),
+      );
+
+      // when & then
+      await expectLater(
+        repository.createTodo(text: 'New todo'),
+        throwsA(isA<TodoNetworkException>()),
+      );
+    });
+
+    test('shouldThrowTodoNetworkException_whenNonDioExceptionOccurs', () async {
+      // given
+      when(
+        () => mockClient.createTodo(body: any(named: 'body')),
+      ).thenThrow(const FormatException('invalid json'));
+
+      // when & then
+      await expectLater(
+        repository.createTodo(text: 'New todo'),
         throwsA(isA<TodoNetworkException>()),
       );
     });

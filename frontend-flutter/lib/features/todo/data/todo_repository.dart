@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:todo/api/models/create_todo_request.dart';
 import 'package:todo/api/models/find_todo_response_todo.dart';
 import 'package:todo/api/models/update_todo_request.dart';
 import 'package:todo/api/todo/todo_client.dart';
@@ -29,6 +30,18 @@ class TodoRepository {
       _throwTodoException(e);
     } on Exception catch (e) {
       debugPrint('TodoRepository.fetchTodos: Unexpected exception - $e');
+      throw TodoNetworkException(e);
+    }
+  }
+
+  Future<void> createTodo({required String text}) async {
+    try {
+      await _client.createTodo(body: CreateTodoRequest(text: text));
+    } on DioException catch (e) {
+      debugPrint('TodoRepository.createTodo: DioException - ${e.type}: ${e.message}');
+      _throwTodoException(e);
+    } on Exception catch (e) {
+      debugPrint('TodoRepository.createTodo: Unexpected exception - $e');
       throw TodoNetworkException(e);
     }
   }
