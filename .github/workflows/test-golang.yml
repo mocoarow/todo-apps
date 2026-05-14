@@ -25,7 +25,7 @@ jobs:
           go-version-file: ${{ matrix.workdir }}/go.mod
 
       # https://github.com/arduino/setup-task/tree/v2.0.0
-      - uses: arduino/setup-task@efd967d9674ec686640e1a5f1a7005eef71f294b
+      - uses: arduino/setup-task@7cb9a560f998206db845206ede40de00f934a540
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
